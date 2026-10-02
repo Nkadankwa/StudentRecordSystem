@@ -10,22 +10,38 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+# Process environment values take precedence over the local .env file.
+load_dotenv(BASE_DIR / '.env', override=False)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1*8s5)6s987@t(ap_!sjhc-%nyxee_4%&m9m@lqiia$*wqj#&5'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+def env_bool(name, default=False):
+    value = os.getenv(name, str(default)).strip().lower()
+    if value not in {'true', 'false', '1', '0', 'yes', 'no', 'on', 'off'}:
+        raise ImproperlyConfigured(f'{name} must be a boolean value.')
+    return value in {'true', '1', 'yes', 'on'}
 
-ALLOWED_HOSTS = []
+
+DEBUG = env_bool('DJANGO_DEBUG', False)
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', '').strip()
+if not SECRET_KEY or SECRET_KEY == 'replace-with-a-generated-secret-key':
+    raise ImproperlyConfigured('Set DJANGO_SECRET_KEY in your environment or .env file.')
+
+ALLOWED_HOSTS = [
+    host.strip() for host in os.getenv('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
+if not DEBUG and (not ALLOWED_HOSTS or '*' in ALLOWED_HOSTS):
+    raise ImproperlyConfigured('Set explicit DJANGO_ALLOWED_HOSTS when debug is disabled.')
 
 
 # Application definition
@@ -37,9 +53,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'accounts.apps.AccountsConfig',
     'management.apps.ManagementConfig',
     'student.apps.StudentConfig',
 ]
+
+AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,17 +93,29 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'StudentRecordSystem',
-        'USER': 'root',
-        'PASSWORD': '123456',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',                                    
+DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite').strip().lower()
+if DB_ENGINE == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.getenv('DB_NAME', str(BASE_DIR / 'db.sqlite3')),
+        }
     }
-}
-
+elif DB_ENGINE == 'mysql':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.getenv('DB_NAME', ''),
+            'USER': os.getenv('DB_USER', ''),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', '127.0.0.1'),
+            'PORT': os.getenv('DB_PORT', '3306'),
+        }
+    }
+    if not DATABASES['default']['NAME'] or not DATABASES['default']['USER']:
+        raise ImproperlyConfigured('MySQL requires DB_NAME and DB_USER.')
+else:
+    raise ImproperlyConfigured('DB_ENGINE must be sqlite or mysql.')
 
 
 # Password validation
@@ -111,7 +142,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+# Display local dates in China; Django stores aware timestamps in UTC.
+TIME_ZONE = os.getenv('DJANGO_TIME_ZONE', 'Asia/Shanghai')
 
 USE_I18N = True
 

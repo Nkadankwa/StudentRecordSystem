@@ -1,16 +1,4 @@
-from django.db import models
+"""Management domain models will be added here when needed.
 
-# Create your models here.
-class Teacher(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-class Administrator(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    def __str__(self):
-        return self.name
-
+TeacherProfile and administrator users are defined in accounts.models.
+"""

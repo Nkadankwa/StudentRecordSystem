@@ -1,0 +1,6 @@
+# Match the verified scaffold environment; review versions when upgrading.
+Django==6.1
+asgiref==3.12.1
+sqlparse==0.5.5
+tzdata==2026.3
+python-dotenv==1.2.1
