@@ -1,0 +1,41 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Student Record System{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'accounts/auth.css' %}">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{% url 'home' %}">Student Record System</a>
+    <nav aria-label="Main navigation">
+      {% if request.user.is_authenticated %}
+        {% if request.user.role == 'student' %}
+          <a href="{% url 'accounts:student_home' %}">Student dashboard</a>
+        {% elif request.user.role == 'teacher' %}
+          <a href="{% url 'accounts:teacher_home' %}">Teacher dashboard</a>
+        {% elif request.user.role == 'administrator' %}
+          <a href="{% url 'accounts:administrator_home' %}">Administrator dashboard</a>
+          {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">Administration</a>{% endif %}
+        {% endif %}
+        <form method="post" action="{% url 'accounts:logout' %}">
+          {% csrf_token %}<button class="secondary" type="submit">Sign out</button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}">Sign in</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main id="main-content" tabindex="-1" class="{% block page_class %}content-page{% endblock %}">
+    {% if messages %}
+      <ul class="messages" aria-live="polite" aria-label="Notifications">
+        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

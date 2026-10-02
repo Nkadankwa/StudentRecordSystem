@@ -107,8 +107,8 @@ Local `.env` and SQLite files are ignored and are not part of the source files.
 - A safe same-site `next` URL is honored for returning to a protected page;
   external destinations are rejected. The destination still enforces its role.
 - Sign out uses a CSRF-protected POST to `/accounts/logout/`; GET does not log out.
-- The home pages currently confirm sign-in. Shared navigation and dashboards
-  are Day 7 work.
+- The shared layout includes navigation, sign-in messages, and role dashboards.
+  Academic dashboard sections are placeholders for future work.
 
 ## Secrets
 
@@ -119,3 +119,17 @@ Python, templates, examples, or documentation. `.env.example` uses placeholders;
 this authentication flow. Test accounts are synthetic, and test passwords are
 generated at runtime. The fast test-only password hasher does not change the
 application's default password hashing.
+
+
+## Shared interface
+
+All public account pages use `templates/base.html`. Navigation shows the signed-in
+user's own dashboard. The Administration link appears only for staff users with
+the administrator role; server-side access checks remain in place.
+Student, teacher, and administrator dashboards have separate templates. Future
+academic features are marked as planned rather than presented as working links.
+
+Custom 403, 404, and 500 pages give a safe recovery link. For local diagnosis,
+Django's detailed debug pages take precedence for 404/500 errors when
+`DJANGO_DEBUG=true`; custom production errors are tested with debug disabled.
+The stylesheet supports narrow screens, keyboard focus, and a skip-to-content link.

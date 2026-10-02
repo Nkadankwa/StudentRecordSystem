@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.contrib.auth.views import LoginView, LogoutView
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
@@ -26,6 +27,11 @@ class AccountLoginView(LoginView):
     authentication_form = LoginForm
     template_name = 'accounts/login.html'
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'You are signed in.')
+        return response
+
     def get_default_redirect_url(self):
         return reverse(role_route(self.request.user))
 
@@ -44,4 +50,4 @@ def home(request):
 def role_home(request, role):
     if request.user.role != role:
         raise PermissionDenied
-    return render(request, 'accounts/home.html')
+    return render(request, f'accounts/{role}_home.html')

@@ -17,3 +17,24 @@ input[aria-invalid="true"] { border-color: #a01926; }
 .errors ul { padding-left: 1.25rem; }
 .help { margin-top: 2rem; color: #405666; }
 ::selection { color: #fff; background: #183d56; }
+
+a { color: #17557c; text-underline-offset: .2em; }
+a:hover { color: #0f2b3d; }
+.site-header { padding: 1rem clamp(1.25rem, 4vw, 3rem); border-bottom: 1px solid #cad4db; background: #fff; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; }
+.brand { color: #182b3a; font-weight: 700; text-decoration: none; line-height: 1.4; }
+nav { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.25rem; }
+nav a { display: inline-flex; align-items: center; min-height: 2.75rem; }
+nav form { margin: 0; }
+.secondary { color: #183d56; background: #e8eef2; }
+.secondary:hover { background: #d7e2ea; }
+.content-page { width: min(100% - 2.5rem, 65rem); margin: clamp(2rem, 5vh, 4rem) auto; }
+.content-page p { max-width: 70ch; }
+.welcome { margin-bottom: 2.5rem; }
+h2 { font-size: 1.25rem; margin: 0 0 .65rem; }
+.dashboard-section { padding: 1.5rem 0; border-top: 1px solid #cad4db; }
+.dashboard-section p { margin: .5rem 0; }
+.availability { font-size: .875rem; color: #405666; }
+.messages { padding: 1rem 1.5rem; background: #e4eee9; color: #234536; margin: 0 0 2rem; }
+.skip-link { position: absolute; top: .5rem; left: 1rem; transform: translateY(-200%); padding: .75rem 1rem; background: #fff; z-index: 2; }
+.skip-link:focus { transform: translateY(0); }
+@media (max-width: 40rem) { .site-header { align-items: flex-start; } nav { width: 100%; } h1 { font-size: 1.75rem; } }

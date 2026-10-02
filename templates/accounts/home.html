@@ -1,21 +1,7 @@
-{% load static %}
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ request.user.get_role_display }} home · Student Record System</title>
-  <link rel="stylesheet" href="{% static 'accounts/auth.css' %}">
-</head>
-<body>
-  <main class="auth-page">
-    <h1>{{ request.user.get_role_display }} home</h1>
-    <p>You are signed in as {{ request.user.get_full_name|default:request.user.username }}.</p>
-    <p>Your dashboard will be available here as the system is developed.</p>
-    <form method="post" action="{% url 'accounts:logout' %}">
-      {% csrf_token %}
-      <button type="submit">Sign out</button>
-    </form>
-  </main>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}{{ request.user.get_role_display }} dashboard · Student Record System{% endblock %}
+{% block content %}
+<h1>{{ request.user.get_role_display }} dashboard</h1>
+<p class="welcome">Welcome, {{ request.user.get_full_name|default:request.user.username }}.</p>
+{% block dashboard_content %}{% endblock %}
+{% endblock %}
