@@ -15,10 +15,13 @@
       {% if request.user.is_authenticated %}
         {% if request.user.role == 'student' %}
           <a href="{% url 'accounts:student_home' %}">Student dashboard</a>
+          <a href="{% url 'students:me' %}">My profile</a>
         {% elif request.user.role == 'teacher' %}
           <a href="{% url 'accounts:teacher_home' %}">Teacher dashboard</a>
+          <a href="{% url 'students:list' %}">Assigned students</a>
         {% elif request.user.role == 'administrator' %}
           <a href="{% url 'accounts:administrator_home' %}">Administrator dashboard</a>
+          <a href="{% url 'students:list' %}">Students</a>
           {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">Administration</a>{% endif %}
         {% endif %}
         <form method="post" action="{% url 'accounts:logout' %}">

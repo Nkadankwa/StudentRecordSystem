@@ -1,6 +1,11 @@
-{% extends "accounts/home.html" %}
-{% block dashboard_content %}
-<section class="dashboard-section"><h2>Assigned students</h2><p>Your assigned students will appear here.</p><p class="availability">Planned feature</p></section>
-<section class="dashboard-section"><h2>Attendance entry</h2><p>Attendance tools for your assigned courses will be available here.</p><p class="availability">Planned feature</p></section>
-<section class="dashboard-section"><h2>Score entry</h2><p>Assessment tools for your assigned courses will be available here.</p><p class="availability">Planned feature</p></section>
-{% endblock %}
+{% extends "accounts/home.html" %}
+
+{% block dashboard_content %}
+
+<section class="dashboard-section"><h2>Assigned students</h2><p><a href="{% url 'students:list' %}">Find your assigned students</a>.</p></section>
+
+<section class="dashboard-section"><h2>Attendance entry</h2><p>Attendance tools for your assigned courses will be available here.</p><p class="availability">Planned feature</p></section>
+
+<section class="dashboard-section"><h2>Score entry</h2><p>Assessment tools for your assigned courses will be available here.</p><p class="availability">Planned feature</p></section>
+
+{% endblock %}

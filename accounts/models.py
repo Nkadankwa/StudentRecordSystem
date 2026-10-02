@@ -23,6 +23,8 @@ class User(AbstractUser):
     objects = AccountManager()
 
     class Meta(AbstractUser.Meta):
+        indexes = [models.Index(fields=['first_name'], name='accounts_first_name_idx'),
+                   models.Index(fields=['last_name'], name='accounts_last_name_idx')]
         constraints = [
             models.CheckConstraint(
                 condition=models.Q(role__in=['student', 'teacher', 'administrator']),

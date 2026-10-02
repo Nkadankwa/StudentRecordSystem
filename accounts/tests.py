@@ -118,3 +118,15 @@ class AccountTests(TestCase):
         with self.assertRaises(ValidationError) as error:
             profile.full_clean()
         self.assertIn('date_of_birth', error.exception.message_dict)
+
+    def test_weak_password_is_rejected_without_creating_account(self):
+        with self.assertRaises(ValidationError):
+            create_account(
+                username='weak-password-test', password=secrets.choice('abc'),
+                role=User.Role.ADMINISTRATOR,
+            )
+        self.assertFalse(User.objects.filter(username='weak-password-test').exists())
+
+    def test_passwordless_account_has_no_usable_password(self):
+        user = create_account(username='passwordless-test', password=None, role=User.Role.ADMINISTRATOR)
+        self.assertFalse(user.has_usable_password())

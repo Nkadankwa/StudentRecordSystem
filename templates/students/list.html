@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Students · Student Record System{% endblock %}
+{% block content %}
+<h1>Students</h1>
+<form method="get" class="search-form">
+  {{ form.as_p }}<button type="submit">Search</button> <a href="{% url 'students:list' %}">Clear search</a>
+</form>
+{% if page_obj.object_list %}
+<div class="table-scroll"><table>
+  <caption>Students you can access</caption>
+  <thead><tr><th scope="col">Student number</th><th scope="col">Name</th></tr></thead>
+  <tbody>{% for profile in page_obj %}<tr><td><a href="{% url 'students:detail' profile.pk %}">{{ profile.student_number }}</a></td><td>{{ profile.user.get_full_name|default:profile.user.username }}</td></tr>{% endfor %}</tbody>
+</table></div>
+<nav class="pagination" aria-label="Student pages">
+  {% if page_obj.has_previous %}<a href="?q={{ query|urlencode }}&amp;page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}<a href="?q={{ query|urlencode }}&amp;page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+</nav>
+{% elif not form.errors %}<p>No students match your search or current assignments.</p>{% endif %}
+{% endblock %}

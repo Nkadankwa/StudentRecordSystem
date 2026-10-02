@@ -7,5 +7,6 @@ from accounts.views import home
 urlpatterns = [
     path('', home, name='home'),
     path('accounts/', include('accounts.urls')),
+    path('students/', include('student.urls')),
     path("admin/", admin.site.urls),
 ]

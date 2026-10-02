@@ -1,5 +1,6 @@
 """Explicit account creation; no signals create hidden or incomplete profiles."""
 from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
 
 from .models import StudentProfile, TeacherProfile, User
@@ -23,6 +24,8 @@ def create_account(*, username, password, role, profile=None, **user_fields):
     if role in profile_models and profile is None:
         raise ValidationError('Profile data is required for students and teachers.')
     user = User(username=username, role=role, **user_fields)
+    if password is not None:
+        validate_password(password, user=user)
     user.set_password(password)
     user.full_clean()
     user.save()
