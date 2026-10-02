@@ -2,7 +2,8 @@
 
 Early Django scaffold with `config`, `accounts`, `management`, and `student` packages.
 Shared templates live in `templates/`; CSS, JavaScript, and images in `static/`.
-Currently only `/admin/` is routed.
+Sign in at `/accounts/login/`. The root URL redirects signed-in users to their
+role home; Django admin remains at `/admin/`.
 
 ## Local startup (PowerShell)
 
@@ -25,7 +26,7 @@ quotes so special characters remain literal. Then run:
 .\.venv\Scripts\python.exe manage.py runserver
 ```
 
-Open http://127.0.0.1:8000/admin/. For the existing checkout, `..\python.exe`
+Open http://127.0.0.1:8000/accounts/login/ (or `/admin/` for staff administration). For the existing checkout, `..\python.exe`
 can replace `.\.venv\Scripts\python.exe` to use the installed environment.
 Do not share or commit `.env` or your local database.
 
@@ -57,10 +58,10 @@ deployment settings are scheduled for a later stage.
 ## Schema status
 
 Day 4 introduces `accounts.User` as `AUTH_USER_MODEL` before initial migrations.
-Initial migrations and database setup are Day 5 work. Until those migrations are
-created, the `migrate` and `createsuperuser` startup steps are not yet available.
-Do not apply this custom-user change to a database already migrated with Django's
-original user model; use a new development database for Day 5.
+Day 5 adds `accounts/migrations/0001_initial.py`. A clean database can now run
+all migrations, including the custom user and profiles. Do not apply this
+custom-user change to a database already migrated with Django's original user
+model; use a new development database.
 
 ## Accounts and profiles
 
@@ -83,3 +84,38 @@ that conflict with an existing profile. Direct ORM writes must follow the same
 validation policy (`full_clean` before saving); cross-table role consistency is
 not a database constraint. Role changes require removing the previous profile
 before creating the replacement, so they should be planned explicitly.
+
+
+## Tests and local administrator
+
+```powershell
+.\.venv\Scripts\python.exe manage.py test accounts
+.\.venv\Scripts\python.exe manage.py makemigrations --check --dry-run
+```
+
+If a local administrator already exists, set its password interactively with
+`manage.py changepassword` followed by that account's username. A fresh checkout
+should follow the `createsuperuser` step in the startup section.
+Local `.env` and SQLite files are ignored and are not part of the source files.
+
+## Authentication
+
+- `/accounts/login/` accepts username and password, with CSRF protection and
+  neutral invalid-credential messages.
+- Successful login sends students, teachers, and administrators to their
+  respective protected home pages. Each role can access only its own home.
+- A safe same-site `next` URL is honored for returning to a protected page;
+  external destinations are rejected. The destination still enforces its role.
+- Sign out uses a CSRF-protected POST to `/accounts/logout/`; GET does not log out.
+- The home pages currently confirm sign-in. Shared navigation and dashboards
+  are Day 7 work.
+
+## Secrets
+
+Application secrets and database credentials come from `.env` or environment
+variables. Never put actual passwords, tokens, or private key contents into
+Python, templates, examples, or documentation. `.env.example` uses placeholders;
+`.env` and common private-key files are ignored. No private key is required by
+this authentication flow. Test accounts are synthetic, and test passwords are
+generated at runtime. The fast test-only password hasher does not change the
+application's default password hashing.
