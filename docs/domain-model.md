@@ -1,4 +1,4 @@
-# Schema and authorization checkpoint (Day 15)
+# Data model and authorization
 
 ```mermaid
 erDiagram
@@ -47,7 +47,7 @@ active administrators see all profiles. Authentication and role checks occur bef
 any lookup. Existing unauthorized profiles produce 403; missing profiles produce
 404 without displaying private fields. Navigation visibility is only a convenience.
 
-Future record query helpers must scope through visible students and relevant
+Record query helpers scope through visible students and relevant
 course/term assignments before fetching results. Model updater checks do not replace
 view authorization. Student-facing pages expose approved profile fields only, with
 no passwords, email addresses, staff flags, or login metadata.
@@ -56,4 +56,5 @@ The review is a local functional checkpoint, not a deployment certification.
 Latest-updater attribution is not a complete historical revision log. Assignment
 sections are labels rather than a section-level enrolment permission boundary.
 Student list pagination is fixed at 20 results; search inputs are limited to 100
-characters. Broader dataset benchmarks remain Day 26 work.
+characters. Record lists have 50 rows per page; see [operations](operations.md)
+for benchmarks, query counts and restore verification.

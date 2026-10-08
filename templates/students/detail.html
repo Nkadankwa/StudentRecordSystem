@@ -2,6 +2,7 @@
 {% block title %}Student profile · Student Record System{% endblock %}
 {% block content %}
 <h1>Student profile</h1>
+<p><a href="{% url 'academics:record' profile.pk %}">View printable record</a></p>
 <dl class="profile-details">
   <dt>Student number</dt><dd>{{ profile.student_number }}</dd>
   <dt>Name</dt><dd>{{ profile.user.get_full_name|default:profile.user.username }}</dd>

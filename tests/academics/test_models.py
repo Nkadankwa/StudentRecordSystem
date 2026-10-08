@@ -10,7 +10,7 @@ from django.urls import reverse
 
 from accounts.models import User
 
-from .models import AcademicYear, Course, Term
+from academics.models import AcademicYear, Course, Term
 
 
 class AcademicSetupTests(TestCase):

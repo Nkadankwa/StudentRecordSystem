@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import AdminUserCreationForm, UserChangeForm
 
+from .admin_policies import AdministratorAdminMixin
 from .models import StudentProfile, TeacherProfile, User
 
 
@@ -18,7 +19,7 @@ class AccountChangeForm(UserChangeForm):
 
 
 @admin.register(User)
-class AccountAdmin(UserAdmin):
+class AccountAdmin(AdministratorAdminMixin, UserAdmin):
     add_form = AccountCreationForm
     form = AccountChangeForm
     fieldsets = UserAdmin.fieldsets + (('Account role', {'fields': ('role',)}),)
@@ -28,14 +29,14 @@ class AccountAdmin(UserAdmin):
 
 
 @admin.register(StudentProfile)
-class StudentProfileAdmin(admin.ModelAdmin):
+class StudentProfileAdmin(AdministratorAdminMixin, admin.ModelAdmin):
     list_display = ('student_number', 'user', 'date_of_birth', 'nationality')
     search_fields = ('student_number', 'user__username', 'user__first_name', 'user__last_name')
     list_select_related = ('user',)
 
 
 @admin.register(TeacherProfile)
-class TeacherProfileAdmin(admin.ModelAdmin):
+class TeacherProfileAdmin(AdministratorAdminMixin, admin.ModelAdmin):
     list_display = ('employee_number', 'user')
     search_fields = ('employee_number', 'user__username', 'user__first_name', 'user__last_name')
     list_select_related = ('user',)

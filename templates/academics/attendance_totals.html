@@ -1,0 +1,3 @@
+<div class="table-scroll" role="region" aria-label="Scrollable records" tabindex="0"><table><thead><tr><th scope="col">Year / term</th><th scope="col">Course</th><th scope="col">Present</th><th scope="col">Absent</th><th scope="col">Late</th><th scope="col">Excused</th></tr></thead><tbody>
+{% for total in totals %}<tr><td>{{ total.session__term__academic_year__name }} / {{ total.session__term__name }}</td><td>{{ total.session__course__code }}</td><td>{{ total.present }}</td><td>{{ total.absent }}</td><td>{{ total.late }}</td><td>{{ total.excused }}</td></tr>{% empty %}<tr><td colspan="6">No attendance totals are available.</td></tr>{% endfor %}
+</tbody></table></div>

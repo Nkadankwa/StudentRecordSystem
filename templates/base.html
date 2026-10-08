@@ -5,7 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}Student Record System{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'accounts/auth.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="stylesheet" href="{% static 'css/print.css' %}" media="print">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -24,6 +25,8 @@
           <a href="{% url 'students:list' %}">Students</a>
           {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">Administration</a>{% endif %}
         {% endif %}
+        <a href="{% url 'academics:scores' %}"{% if request.resolver_match.namespace == 'academics' and request.resolver_match.url_name == 'scores' or request.resolver_match.url_name == 'score_entry' %} aria-current="page"{% endif %}>Scores</a>
+        <a href="{% url 'academics:attendance' %}"{% if request.resolver_match.namespace == 'academics' and request.resolver_match.url_name == 'attendance' or request.resolver_match.url_name == 'attendance_entry' or request.resolver_match.url_name == 'attendance_new' %} aria-current="page"{% endif %}>Attendance</a>
         <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}<button class="secondary" type="submit">Sign out</button>
         </form>

@@ -4,7 +4,7 @@ from django.contrib.auth import SESSION_KEY
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from .models import User
+from accounts.models import User
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])

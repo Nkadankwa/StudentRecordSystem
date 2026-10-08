@@ -1,4 +1,5 @@
 from django.contrib import admin
+from accounts.admin_policies import AdministratorAdminMixin
 
 from .models import (
     AcademicYear, Course, Term, Assessment, AttendanceRecord, AttendanceSession,
@@ -7,14 +8,15 @@ from .models import (
 
 
 @admin.register(AcademicYear)
-class AcademicYearAdmin(admin.ModelAdmin):
+class AcademicYearAdmin(AdministratorAdminMixin, admin.ModelAdmin):
+    date_hierarchy = 'start_date'
     list_display = ('name', 'start_date', 'end_date', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('name',)
 
 
 @admin.register(Term)
-class TermAdmin(admin.ModelAdmin):
+class TermAdmin(AdministratorAdminMixin, admin.ModelAdmin):
     list_display = ('name', 'academic_year', 'start_date', 'end_date')
     list_filter = ('academic_year',)
     search_fields = ('name', 'academic_year__name')
@@ -22,14 +24,15 @@ class TermAdmin(admin.ModelAdmin):
 
 
 @admin.register(Course)
-class CourseAdmin(admin.ModelAdmin):
+class CourseAdmin(AdministratorAdminMixin, admin.ModelAdmin):
     list_display = ('code', 'title', 'is_active')
     list_filter = ('is_active',)
     search_fields = ('code', 'title')
 
 
 @admin.register(TeachingAssignment)
-class TeachingAssignmentAdmin(admin.ModelAdmin):
+class TeachingAssignmentAdmin(AdministratorAdminMixin, admin.ModelAdmin):
+    autocomplete_fields = ('teacher', 'course', 'term')
     list_display = ('teacher', 'course', 'term', 'section')
     list_filter = ('term', 'course')
     search_fields = ('teacher__employee_number', 'teacher__user__username', 'course__code', 'section')
@@ -37,7 +40,9 @@ class TeachingAssignmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Enrollment)
-class EnrollmentAdmin(admin.ModelAdmin):
+class EnrollmentAdmin(AdministratorAdminMixin, admin.ModelAdmin):
+    autocomplete_fields = ('student', 'course', 'term')
+    date_hierarchy = 'enrollment_date'
     list_display = ('student', 'course', 'term', 'status', 'enrollment_date')
     list_filter = ('term', 'course', 'status')
     search_fields = ('student__student_number', 'student__user__username', 'course__code')
@@ -45,14 +50,16 @@ class EnrollmentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Assessment)
-class AssessmentAdmin(admin.ModelAdmin):
+class AssessmentAdmin(AdministratorAdminMixin, admin.ModelAdmin):
+    date_hierarchy = 'due_date'
+    autocomplete_fields = ('course', 'term')
     list_display = ('title', 'course', 'term', 'maximum_score', 'weight', 'due_date')
     list_filter = ('course', 'term', 'category')
     search_fields = ('title', 'course__code')
     list_select_related = ('course', 'term__academic_year')
 
 
-class AuditedAdmin(admin.ModelAdmin):
+class AuditedAdmin(AdministratorAdminMixin, admin.ModelAdmin):
     readonly_fields = ('updated_by', 'created_at', 'updated_at')
 
     def get_form(self, request, obj=None, **kwargs):
@@ -79,7 +86,7 @@ class ScoreAdmin(AuditedAdmin):
 
 
 @admin.register(AttendanceSession)
-class AttendanceSessionAdmin(admin.ModelAdmin):
+class AttendanceSessionAdmin(AdministratorAdminMixin, admin.ModelAdmin):
     list_display = ('course', 'term', 'date', 'teacher', 'lesson_label')
     list_filter = ('course', 'term', 'teacher')
     search_fields = ('course__code', 'lesson_label', 'teacher__employee_number')

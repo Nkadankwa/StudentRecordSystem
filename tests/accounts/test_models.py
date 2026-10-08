@@ -8,8 +8,8 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from .models import StudentProfile, TeacherProfile, User
-from .services import create_account
+from accounts.models import StudentProfile, TeacherProfile, User
+from accounts.services import create_account
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])

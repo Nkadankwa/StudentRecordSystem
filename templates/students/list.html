@@ -6,7 +6,7 @@
   {{ form.as_p }}<button type="submit">Search</button> <a href="{% url 'students:list' %}">Clear search</a>
 </form>
 {% if page_obj.object_list %}
-<div class="table-scroll"><table>
+<div class="table-scroll" role="region" aria-label="Scrollable records" tabindex="0"><table>
   <caption>Students you can access</caption>
   <thead><tr><th scope="col">Student number</th><th scope="col">Name</th></tr></thead>
   <tbody>{% for profile in page_obj %}<tr><td><a href="{% url 'students:detail' profile.pk %}">{{ profile.student_number }}</a></td><td>{{ profile.user.get_full_name|default:profile.user.username }}</td></tr>{% endfor %}</tbody>

@@ -1,0 +1,7 @@
+{% if pagination.page.paginator.num_pages > 1 %}
+<nav class="pagination" aria-label="{{ label|default:'Record pages' }}">
+{% if pagination.page.has_previous %}<a href="?{% if pagination.query %}{{ pagination.query }}&amp;{% endif %}{{ pagination.parameter }}={{ pagination.page.previous_page_number }}">Previous</a>{% endif %}
+<span>Page {{ pagination.page.number }} of {{ pagination.page.paginator.num_pages }}</span>
+{% if pagination.page.has_next %}<a href="?{% if pagination.query %}{{ pagination.query }}&amp;{% endif %}{{ pagination.parameter }}={{ pagination.page.next_page_number }}">Next</a>{% endif %}
+</nav>
+{% endif %}

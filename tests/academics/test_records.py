@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import StudentProfile, TeacherProfile, User
-from .models import (AcademicYear, Term, Course, TeachingAssignment, Enrollment,
+from academics.models import (AcademicYear, Term, Course, TeachingAssignment, Enrollment,
                      Assessment, Score, AttendanceSession, AttendanceRecord)
 
 

@@ -4,8 +4,8 @@
 
 <section class="dashboard-section"><h2>My profile</h2><p><a href="{% url 'students:me' %}">View your student profile</a>.</p></section>
 
-<section class="dashboard-section"><h2>My attendance</h2><p>Your attendance records will be available here.</p><p class="availability">Planned feature</p></section>
+<section class="dashboard-section"><h2>My attendance</h2><p><a href="{% url 'academics:attendance' %}">View your attendance</a>.</p></section>
 
-<section class="dashboard-section"><h2>My scores</h2><p>Your assessment results will be available here.</p><p class="availability">Planned feature</p></section>
+<section class="dashboard-section"><h2>My scores</h2><p><a href="{% url 'academics:scores' %}">View your scores</a>.</p></section>
 
 {% endblock %}

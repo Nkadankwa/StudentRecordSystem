@@ -2,7 +2,7 @@ from django.test import RequestFactory, TestCase, override_settings
 from django.urls import reverse
 from django.views.defaults import server_error
 
-from .models import User
+from accounts.models import User
 
 
 @override_settings(DEBUG=False)

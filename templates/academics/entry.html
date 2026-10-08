@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Student Record System{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+{% if is_attendance and not session %}
+<form method="get" class="search-form"><label for="id_course_selector">Course, term and teacher</label><select name="assignment" id="id_course_selector">{% for item in session_form.fields.assignment.queryset %}<option value="{{ item.pk }}"{% if item == assignment %} selected{% endif %}>{{ item }}</option>{% endfor %}</select><button type="submit">Load roster</button></form>
+{% endif %}
+{% if assignment or assessment or request.method == 'POST' %}
+{% if assessment %}<p>{{ assessment.course }} · {{ assessment.term }}. Maximum score: {{ assessment.maximum_score }}. Blank scores leave existing results unchanged.</p>{% endif %}
+<form method="post">
+{% csrf_token %}
+<input type="hidden" name="revision" value="{{ revision }}">
+{% if formset.total_error_count or session_form.errors %}<p class="errors" role="alert">Some entries could not be saved. Correct the errors below and try again.</p>{% endif %}
+{% if session_form %}
+  {{ session_form.assignment.as_hidden }}
+  {% if session_form.assignment.errors %}<div class="errors" role="alert">{{ session_form.assignment.errors }}</div>{% endif %}
+  {% if assignment %}<p>{{ assignment.course }} · {{ assignment.term }} · {{ assignment.teacher }}</p><p>Session dates must fall between {{ assignment.term.start_date|date:"Y-m-d" }} and {{ assignment.term.end_date|date:"Y-m-d" }}.</p>{% endif %}
+  {{ session_form.non_field_errors }}
+  <div class="field"><label for="{{ session_form.date.id_for_label }}">{{ session_form.date.label }}</label>{{ session_form.date }}{% if session_form.date.errors %}<div class="errors" role="alert" id="{{ session_form.date.id_for_label }}_errors">{{ session_form.date.errors }}</div>{% endif %}</div>
+  <div class="field"><label for="{{ session_form.lesson_label.id_for_label }}">{{ session_form.lesson_label.label }}</label>{{ session_form.lesson_label }}{% if session_form.lesson_label.errors %}<div class="errors" role="alert" id="{{ session_form.lesson_label.id_for_label }}_errors">{{ session_form.lesson_label.errors }}</div>{% endif %}</div>
+{% endif %}
+{{ formset.management_form }}
+{% if formset.non_form_errors %}<div class="errors" role="alert">{{ formset.non_form_errors }}</div>{% endif %}
+{% if rows %}
+<p>Review every student before saving. All changes are saved together.</p>
+{% for form, student in rows %}<fieldset class="record-entry"><legend>{{ student.student_number }} · {{ student.user.get_full_name|default:student.user.username }}</legend>
+{{ form.student }}{% if form.student.errors %}<div class="errors" role="alert">The student identifier is invalid. Reload the roster before saving.</div>{% endif %}{{ form.non_field_errors }}{% for field in form.visible_fields %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="errors" role="alert" id="{{ field.id_for_label }}_errors">{{ field.errors }}</div>{% endif %}</div>{% endfor %}</fieldset>{% endfor %}
+<button type="submit">Save {% if is_attendance %}attendance{% else %}scores{% endif %}</button>
+{% else %}<p>No enrolled students are available for this course and term.</p>{% endif %}
+</form>
+{% else %}<p>Select an assigned course to load its enrolled students.</p>{% endif %}
+{% endblock %}

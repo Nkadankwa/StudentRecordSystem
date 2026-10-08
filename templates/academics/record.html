@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Student record · Student Record System{% endblock %}
+{% block content %}
+<h1>Student record</h1>
+<p class="print-controls"><button type="button" onclick="window.print()">Print record</button></p>
+<section class="record-section"><h2>Student details</h2>
+<dl class="profile-details"><dt>Student number</dt><dd>{{ profile.student_number }}</dd><dt>Name</dt><dd>{{ profile.user.get_full_name|default:profile.user.username }}</dd><dt>Date of birth</dt><dd>{{ profile.date_of_birth|date:"Y-m-d" }}</dd><dt>Age</dt><dd>{{ profile.age }}</dd><dt>Nationality</dt><dd>{{ profile.nationality|default:"Not recorded" }}</dd><dt>Gender</dt><dd>{{ profile.gender|default:"Not recorded" }}</dd></dl></section>
+<section class="record-section"><h2>Course enrolments</h2><ul>{% for enrollment in enrollments %}<li>{{ enrollment.term }} · {{ enrollment.course }} · {{ enrollment.get_status_display }}</li>{% empty %}<li>No enrolments are available in your permitted courses.</li>{% endfor %}</ul></section>
+<section class="record-section"><h2>Scores</h2>{% include "academics/score_table.html" with nested=True %}</section>
+<section class="record-section"><h2>Attendance summary</h2>{% include "academics/attendance_totals.html" %}</section>
+{% endblock %}

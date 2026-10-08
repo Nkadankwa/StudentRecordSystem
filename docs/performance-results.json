@@ -1,0 +1,31 @@
+{
+  "dataset": {
+    "students": 100,
+    "courses": 5,
+    "terms": 2,
+    "enrollments": 1000,
+    "scores": 1000,
+    "attendance_records": 1000
+  },
+  "environment": {
+    "python": "3.14.0",
+    "django": "6.1",
+    "database": "SQLite",
+    "method": "Django test client, teacher role, one warmup and three timed requests; 20 students or 50 academic records/page"
+  },
+  "requests": {
+    "student_lookup": {
+      "median_seconds": 0.0121,
+      "queries": 4
+    },
+    "scores": {
+      "median_seconds": 0.0281,
+      "queries": 8
+    },
+    "attendance": {
+      "median_seconds": 0.0396,
+      "queries": 9
+    }
+  },
+  "backup_restore": "Passed: integrity, counts and restored Django request"
+}
