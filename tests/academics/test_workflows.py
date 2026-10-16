@@ -19,6 +19,25 @@ class RecordWorkflowTests(TestCase):
     def sign_in(self, user=None):
         self.client.force_login(user or self.teacher.user)
 
+    def test_legacy_sql_timestamp_repair_preserves_instant_and_allows_correction(self):
+        from importlib import import_module
+        from django.apps import apps
+        from django.db import connection
+        score = self.score(); score.save()
+        timestamp = score.updated_at
+        with connection.cursor() as cursor:
+            cursor.execute('UPDATE academics_score SET updated_at = %s WHERE id = %s',
+                [timestamp.isoformat(sep=' '), score.pk])
+        migration = import_module('academics.migrations.0003_normalize_sqlite_timestamps')
+        migration.normalize_timestamps(apps, connection.schema_editor())
+        score.refresh_from_db()
+        self.assertEqual(score.updated_at, timestamp)
+        self.sign_in()
+        response = self.client.post(reverse('academics:score_entry', args=[self.assessment.pk]), self.rows())
+        self.assertEqual(response.status_code, 302)
+        score.refresh_from_db()
+        self.assertEqual(score.value, Decimal('90'))
+
     def test_record_writes_require_csrf(self):
         protected = Client(enforce_csrf_checks=True)
         protected.force_login(self.teacher.user)
@@ -64,7 +83,7 @@ class RecordWorkflowTests(TestCase):
 
     def rows(self, attendance=False, students=None, session=None):
         students = students or [self.student]
-        data = {'form-TOTAL_FORMS': str(len(students)), 'form-INITIAL_FORMS': str(len(students))}
+        data = {'form-TOTAL_FORMS': str(len(students)), 'form-INITIAL_FORMS': str(len(students)), 'reason': 'Correcting the submitted fixture after checking the original record.'}
         for index, student in enumerate(students):
             data[f'form-{index}-student'] = str(student.pk)
             data[f'form-{index}-remarks'] = ''

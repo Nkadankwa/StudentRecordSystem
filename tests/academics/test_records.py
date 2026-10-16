@@ -175,18 +175,13 @@ class AcademicRecordsTests(TestCase):
         with self.assertRaises(ValidationError):
             self.session.save()
 
-    def test_admin_records_current_actor_and_rejects_invalid_score(self):
+    def test_administrator_cannot_add_scores_or_attendance_in_admin(self):
         self.client.force_login(self.admin)
-        response = self.client.post(reverse('admin:academics_score_add'), {'assessment': self.assessment.pk, 'student': self.student.pk, 'value': '101', 'remarks': ''})
-        self.assertEqual(response.status_code, 200)
+        for route in ['admin:academics_score_add', 'admin:academics_attendancerecord_add', 'admin:academics_attendancesession_add']:
+            self.assertEqual(self.client.get(reverse(route)).status_code, 403)
+            self.assertEqual(self.client.post(reverse(route), {}).status_code, 403)
         self.assertFalse(Score.objects.exists())
-        response = self.client.post(reverse('admin:academics_score_add'), {'assessment': self.assessment.pk, 'student': self.student.pk, 'value': '90', 'remarks': '', 'updated_by': self.student.user_id})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Score.objects.get().updated_by, self.admin)
-        response = self.client.post(reverse('admin:academics_attendancerecord_add'), {'session': self.session.pk, 'student': self.student.pk, 'status': 'present', 'remarks': ''})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(AttendanceRecord.objects.get().updated_by, self.admin)
-
+        self.assertFalse(AttendanceRecord.objects.exists())
 
     def test_malformed_decimals_raise_validation_errors(self):
         for value in ('not-a-number', Decimal('NaN'), Decimal('Infinity')):

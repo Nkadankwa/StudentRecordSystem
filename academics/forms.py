@@ -28,12 +28,17 @@ class AccessibleEntryForm(forms.Form):
 class ScoreRowForm(AccessibleEntryForm):
     student = forms.IntegerField(widget=forms.HiddenInput)
     value = forms.DecimalField(max_digits=8, decimal_places=2, min_value=0, required=False, label='Score')
+    resit_value = forms.DecimalField(max_digits=8, decimal_places=2, min_value=0, required=False, label='Resit score')
     remarks = forms.CharField(required=False, max_length=2000, widget=forms.Textarea(attrs={'rows': 2}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['value'].widget.attrs['data-score-input'] = ''
 
 
 class AttendanceRowForm(AccessibleEntryForm):
     student = forms.IntegerField(widget=forms.HiddenInput)
-    status = forms.ChoiceField(choices=[('', 'Choose status')] + list(AttendanceRecord.Status.choices))
+    status = forms.ChoiceField(choices=AttendanceRecord.Status.choices, widget=forms.RadioSelect)
     remarks = forms.CharField(required=False, max_length=2000, widget=forms.Textarea(attrs={'rows': 2}))
 
 
@@ -49,3 +54,9 @@ class AttendanceSessionForm(AccessibleEntryForm):
     def __init__(self, *args, user, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['assignment'].queryset = visible_assignments(user)
+
+
+class CorrectionReasonForm(AccessibleEntryForm):
+    reason = forms.CharField(required=False, max_length=4000, label='Reason for changes',
+                             widget=forms.Textarea(attrs={'rows': 3}),
+                             help_text='Required when changing submitted records. Changes are sent to the administrator for review.')

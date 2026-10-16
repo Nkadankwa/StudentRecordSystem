@@ -227,6 +227,9 @@ class Score(ValidatedModel):
     assessment = models.ForeignKey(Assessment, on_delete=models.PROTECT, related_name='scores')
     student = models.ForeignKey('accounts.StudentProfile', on_delete=models.PROTECT, related_name='scores')
     value = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(0)])
+    resit_value = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)])
+    resit_policy_snapshot = models.JSONField(default=dict, blank=True, editable=False)
+    resit_effective_value = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True, editable=False)
     remarks = models.TextField(blank=True)
     updated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='updated_scores', editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -237,6 +240,7 @@ class Score(ValidatedModel):
         constraints = [
             models.UniqueConstraint(fields=('assessment', 'student'), name='academics_unique_student_score'),
             models.CheckConstraint(condition=models.Q(value__gte=0), name='academics_nonnegative_score'),
+            models.CheckConstraint(condition=models.Q(resit_value__isnull=True, resit_effective_value__isnull=True) | models.Q(resit_value__gte=0, resit_effective_value__gte=0), name='academics_valid_resit_values'),
         ]
 
     def clean(self):
@@ -249,6 +253,44 @@ class Score(ValidatedModel):
             check_enrollment(self.student_id, assessment.course_id, assessment.term_id)
             if self.updated_by_id:
                 check_updater(related(self, 'updated_by'), assessment.course_id, assessment.term_id)
+            from .grading import validate_score_resit
+            validate_score_resit(self)
+
+    @property
+    def effective_value(self):
+        return self.resit_effective_value if self.resit_value is not None else self.value
+
+    @property
+    def effective_percentage(self):
+        return self.effective_value * 100 / self.effective_maximum
+
+    @property
+    def effective_maximum(self):
+        return Decimal(self.resit_policy_snapshot['maximum_score']) if self.resit_value is not None else self.assessment.maximum_score
+
+    @property
+    def course_resit_required(self):
+        return self.resit_value is not None and self.effective_percentage < Decimal(self.resit_policy_snapshot['pass_percentage'])
+
+    @property
+    def is_course_resit_required(self):
+        return self.course_resit_required
+
+    @property
+    def can_resit(self):
+        from .grading import eligible_for_resit
+        return self.resit_value is None and eligible_for_resit(self)
+
+    @property
+    def outcome(self):
+        from .grading import policy_for
+        if self.resit_value is not None:
+            threshold = Decimal(self.resit_policy_snapshot['pass_percentage'])
+            return 'Pass · resit' if self.effective_percentage >= threshold else 'Fail — course resit required'
+        policy = policy_for(self)
+        if policy is None:
+            return 'No grading rule configured'
+        return 'Pass' if self.effective_percentage >= policy.pass_percentage else 'Resit required'
 
     def __str__(self):
         return f'{self.student} — {self.assessment}: {self.value}'
@@ -316,3 +358,8 @@ class AttendanceRecord(ValidatedModel):
 
     def __str__(self):
         return f'{self.student} — {self.session}: {self.get_status_display()}'
+
+
+from .grading_models import CourseTermGradingPolicy  # noqa: E402,F401
+
+from .correction_models import AcademicCorrection  # noqa: E402,F401

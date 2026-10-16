@@ -67,7 +67,7 @@ def visible_assessments(user):
 
 def visible_scores(user):
     from academics.models import Score
-    qs = Score.objects.select_related('student__user', 'assessment__course', 'assessment__term__academic_year', 'updated_by')
+    qs = Score.objects.select_related('student__user', 'assessment__course', 'assessment__term__academic_year', 'updated_by').prefetch_related('assessment__course__grading_policies')
     if user.is_authenticated and user.is_active and user.role == User.Role.STUDENT:
         return qs.filter(student__user=user)
     return scoped_academic(qs, user, 'assessment__course_id', 'assessment__term_id')

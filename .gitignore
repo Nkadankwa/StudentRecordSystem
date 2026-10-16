@@ -1,4 +1,9 @@
 .venv/
+node_modules/
+.design-reference/
+.release-env/
+.release-check-*/
+dist/
 venv/
 myenv/
 __pycache__/
@@ -24,8 +29,9 @@ htmlcov/
 media/
 staticfiles/
 ui-review-path.txt
-docs/*
-!docs/domain-model.md
-!docs/deployment.md
-!docs/operations.md
-!docs/performance-results.json
+docs/
+DESIGN.md
+data/README.md
+*.log
+
+docs/operations.md

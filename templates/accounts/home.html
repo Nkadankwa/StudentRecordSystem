@@ -1,7 +1,7 @@
-{% extends "base.html" %}
-{% block title %}{{ request.user.get_role_display }} dashboard · Student Record System{% endblock %}
-{% block content %}
-<h1>{{ request.user.get_role_display }} dashboard</h1>
-<p class="welcome">Welcome, {{ request.user.get_full_name|default:request.user.username }}.</p>
-{% block dashboard_content %}{% endblock %}
-{% endblock %}
+{% extends 'base.html' %}{% load static assets %}
+{% block title %}{{ request.user.get_role_display }} dashboard · Student Record System{% endblock %}
+{% block extra_styles %}<link rel="stylesheet" href="{% versioned_static 'css/dashboard.css' %}">{% endblock %}
+{% block content %}
+<div class="dashboard-heading"><div><h1>{% block dashboard_title %}{{ request.user.get_role_display }} dashboard{% endblock %}</h1><p class="dashboard-welcome">{% block dashboard_subtitle %}{{ request.user.get_full_name|default:request.user.username }} · {{ today|date:'l, Y-m-d' }}{% endblock %}</p></div><div class="dashboard-actions">{% block dashboard_actions %}{% endblock %}</div></div>
+<div class="layout-metrics" data-layout-metrics data-layout-group aria-label="Academic summaries">{% for label, value in dashboard_counts %}<details open class="layout-metric layout-metric-compact" data-layout-widget="metric-{{ forloop.counter }}" data-layout-title="{{ label }}"><summary>{{ label }}</summary><div class="layout-metric-body"><strong class="layout-metric-value">{{ value }}</strong></div></details>{% endfor %}</div>
+{% block dashboard_content %}{% endblock %}{% endblock %}

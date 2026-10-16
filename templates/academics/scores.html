@@ -3,7 +3,7 @@
 {% block content %}
 <h1>Scores</h1>
 <form method="get" class="search-form">{{ filter_form.as_p }}<button type="submit">Filter</button> <a href="{% url 'academics:scores' %}">Clear filters</a></form>
-{% if request.user.role != 'student' %}
+{% if request.user.role == 'teacher' %}
 <details{% if request.GET.entries %} open{% endif %}><summary>Enter or update scores</summary><ul>{% for assessment in assessments %}<li><a href="{% url 'academics:score_entry' assessment.pk %}">{{ assessment.term }} · {{ assessment }}</a></li>{% empty %}<li>No assigned assessments are available.</li>{% endfor %}</ul>{% include 'academics/pagination.html' with pagination=entries_pagination label='Assessment pages' %}</details>
 {% endif %}
 {% include "academics/score_table.html" %}

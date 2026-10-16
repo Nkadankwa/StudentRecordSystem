@@ -1,11 +1,7 @@
-{% extends "accounts/home.html" %}
-
-{% block dashboard_content %}
-
-<section class="dashboard-section"><h2>Assigned students</h2><p><a href="{% url 'students:list' %}">Find your assigned students</a>.</p></section>
-
-<section class="dashboard-section"><h2>Attendance entry</h2><p><a href="{% url 'academics:attendance' %}">View attendance</a> or <a href="{% url 'academics:attendance_new' %}">take attendance</a> for your courses.</p></section>
-
-<section class="dashboard-section"><h2>Score entry</h2><p><a href="{% url 'academics:scores' %}">View and enter scores</a> for your courses.</p></section>
-
-{% endblock %}
+{% extends 'accounts/home.html' %}
+{% block dashboard_subtitle %}{{ request.user.get_full_name|default:request.user.username }} · Manage your assigned classes, scores and attendance.{% endblock %}
+{% block dashboard_actions %}<a class="action-primary" href="{% url 'academics:attendance_new' %}">Take attendance</a><a class="action-secondary" href="{% url 'academics:scores' %}">Enter scores</a>{% endblock %}
+{% block dashboard_content %}<div class="dashboard-layout" data-layout-columns><div class="dashboard-main" data-layout-column>
+<section class="workspace" data-layout-widget="assignments" data-layout-title="Your teaching assignments"><div class="workspace-heading"><h2>Your teaching assignments</h2><a href="{% url 'academics:assignments' %}">All my classes</a></div>{% if assignments %}<div class="table-scroll" role="region" aria-label="Teaching assignments" tabindex="0"><table><thead><tr><th scope="col">Course / term</th><th scope="col">Students</th><th scope="col">Action</th></tr></thead><tbody>{% for assignment in assignments %}<tr><td><strong>{{ assignment.course.code }} · {{ assignment.course.title }}</strong><div class="table-detail">{{ assignment.term }}{% if assignment.section %} · {{ assignment.section }}{% endif %}</div></td><td>{{ assignment.roster_count }}</td><td><a href="{% url 'academics:roster' assignment.pk %}">View class roster</a><br><a href="{% url 'academics:attendance_new' %}?assignment={{ assignment.pk }}">Take attendance<span class="visually-hidden"> for {{ assignment.course.code }}</span></a></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="dashboard-empty"><h3>No teaching assignments yet</h3><p>Ask an administrator to assign your teacher profile to a course and term. Your roster and entry forms will appear here.</p></div>{% endif %}</section>
+<section class="workspace" data-layout-widget="score-entry" data-layout-title="Enter or correct scores"><div class="workspace-heading"><h2>Enter or correct scores</h2><a href="{% url 'academics:scores' %}">All assessments</a></div>{% include 'accounts/dashboard_assessments.html' %}</section></div>
+<aside class="workspace" data-layout-widget="assigned-students" data-layout-title="Assigned students" data-layout-column><h2>Assigned students</h2><p class="workspace-intro">Recently added profiles in your permitted courses.</p>{% include 'accounts/dashboard_students.html' %}<p><a href="{% url 'students:list' %}">Search your full roster</a></p></aside></div>{% endblock %}

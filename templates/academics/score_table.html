@@ -3,7 +3,7 @@
 <section class="record-section">{% if nested %}<h3>{{ term.grouper }}</h3>{% else %}<h2>{{ term.grouper }}</h2>{% endif %}
 {% regroup term.list by assessment.course as courses %}
 {% for course in courses %}{% if nested %}<h4>{{ course.grouper }}</h4>{% else %}<h3>{{ course.grouper }}</h3>{% endif %}
-<div class="table-scroll" role="region" aria-label="Scrollable records" tabindex="0"><table><thead><tr><th scope="col">Student</th><th scope="col">Assessment</th><th scope="col">Score</th><th scope="col">Maximum</th><th scope="col">Last updated</th></tr></thead><tbody>
-{% for score in course.list %}<tr><td>{{ score.student.student_number }}</td><td>{{ score.assessment.title }}</td><td>{{ score.value }}</td><td>{{ score.assessment.maximum_score }}</td><td>{{ score.updated_at|date:"Y-m-d H:i" }}</td></tr>{% endfor %}
+<div class="table-scroll" role="region" aria-label="Scrollable records" tabindex="0"><table><thead><tr><th scope="col">Student</th><th scope="col">Assessment</th><th scope="col">Original</th><th scope="col">Resit</th><th scope="col">Calculated score</th><th scope="col">Maximum</th><th scope="col">Result</th><th scope="col">Last updated</th></tr></thead><tbody>
+{% for score in course.list %}<tr><td>{{ score.student.student_number }}</td><td>{{ score.assessment.title }}</td><td>{{ score.value }}</td><td>{% if score.resit_value != None %}<span class="status-badge">Resit</span> {{ score.resit_value }}{% else %}—{% endif %}</td><td>{{ score.effective_value }}</td><td>{% if score.resit_value != None %}{{ score.resit_policy_snapshot.maximum_score }}{% else %}{{ score.assessment.maximum_score }}{% endif %}</td><td>{{ score.outcome }}</td><td>{{ score.updated_at|date:"Y-m-d H:i" }}</td></tr>{% endfor %}
 </tbody></table></div>{% endfor %}</section>
 {% empty %}<p>No scores are available for these filters.</p>{% endfor %}

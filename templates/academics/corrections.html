@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Record corrections</h1>
+<p>Submitted changes take effect immediately and remain available for administrator review.</p>
+<div class="workspace table-scroll"><table><thead><tr><th>Teacher</th><th>Records</th><th>Submitted</th><th>Status</th><th>Review</th></tr></thead><tbody>
+{% for item in corrections %}<tr><td>{{ item.teacher.get_full_name|default:item.teacher.username }}</td><td>{{ item.get_kind_display }} — {{ item.assessment|default:item.session }}</td><td>{{ item.created_at }}</td><td>{{ item.get_status_display }}</td><td><a href="{% url 'academics:correction_detail' item.pk %}">View changes</a></td></tr>{% empty %}<tr><td colspan="5">No corrections submitted.</td></tr>{% endfor %}
+</tbody></table></div>
+{% include 'academics/pagination.html' %}
+{% endblock %}

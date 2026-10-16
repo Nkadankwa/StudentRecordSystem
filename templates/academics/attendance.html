@@ -3,12 +3,12 @@
 {% block content %}
 <h1>Attendance</h1>
 <form method="get" class="search-form">{{ filter_form.as_p }}<button type="submit">Filter</button> <a href="{% url 'academics:attendance' %}">Clear filters</a></form>
-{% if request.user.role != 'student' %}<p><a href="{% url 'academics:attendance_new' %}">Take attendance</a></p>
+{% if request.user.role == 'teacher' %}<p><a href="{% url 'academics:attendance_new' %}">Take attendance</a></p>
 <details{% if request.GET.entries %} open{% endif %}><summary>Update an existing session</summary><ul>{% for session in sessions %}<li><a href="{% url 'academics:attendance_entry' session.pk %}">{{ session.term }} · {{ session }}</a></li>{% empty %}<li>No assigned sessions are available.</li>{% endfor %}</ul>{% include 'academics/pagination.html' with pagination=entries_pagination label='Session pages' %}</details>{% endif %}
 <h2>Attendance totals</h2>{% include "academics/attendance_totals.html" %}
 <h2>Attendance records</h2>
 <div class="table-scroll" role="region" aria-label="Scrollable records" tabindex="0"><table><thead><tr><th scope="col">Term</th><th scope="col">Course</th><th scope="col">Date</th><th scope="col">Student</th><th scope="col">Status</th></tr></thead><tbody>
-{% for record in records %}<tr><td>{{ record.session.term }}</td><td>{{ record.session.course.code }}</td><td>{{ record.session.date|date:"Y-m-d" }}</td><td>{{ record.student.student_number }}</td><td>{{ record.get_status_display }}</td></tr>{% empty %}<tr><td colspan="5">No attendance records are available.</td></tr>{% endfor %}
+{% for record in records %}<tr><td>{{ record.session.term }}</td><td>{{ record.session.course.code }}</td><td>{{ record.session.date|date:"Y-m-d" }}</td><td>{{ record.student.student_number }}</td><td><span class="status-badge status-{{ record.status }}">{{ record.get_status_display }}</span></td></tr>{% empty %}<tr><td colspan="5">No attendance records are available.</td></tr>{% endfor %}
 </tbody></table></div>
 {% include "academics/pagination.html" %}
 {% endblock %}

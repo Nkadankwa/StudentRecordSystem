@@ -13,11 +13,12 @@ Teacher requests use Django's test client with one warmup and three timed sample
 
 | Request | Median seconds | Queries |
 | --- | ---: | ---: |
-| Student prefix lookup | 0.0121 | 4 |
-| Score summary | 0.0281 | 8 |
-| Attendance summary | 0.0396 | 9 |
+| Student prefix lookup | 0.0148 | 6 |
+| Score summary | 0.0388 | 10 |
+| Attendance summary | 0.0426 | 11 |
 
-Measured on Windows, Python 3.14.0, Django 6.1, local SQLite on 2026-10-05.
+Measured after the frontend integration on Windows, Python 3.14.0, Django 6.1,
+local SQLite on 2026-10-14. Counts include the permission-scoped academic-period header.
 See [machine-readable results](performance-results.json). All samples met the
 two-second target and 15-query budget. Measurements exclude network/proxy time
 and concurrent production load; rerun on deployment hardware.

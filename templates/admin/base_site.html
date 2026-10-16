@@ -1,0 +1,5 @@
+{% extends 'admin/base.html' %}{% load static assets %}
+{% block title %}{{ title }} · Student Record System{% endblock %}
+{% block branding %}<div id="site-name"><a href="{% url 'accounts:administrator_home' %}">Student Record System</a></div>{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% versioned_static 'css/admin.css' %}">{% endblock %}
+{% block nav-global %}<a class="workspace-return" href="{% url 'accounts:setup' %}">Return to academic workspace</a>{% endblock %}

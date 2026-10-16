@@ -90,3 +90,12 @@ class TeacherProfile(models.Model):
 
     def __str__(self):
         return f'{self.employee_number} — {self.user.get_full_name() or self.user.username}'
+
+
+class WorkspaceLayout(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='workspace_layouts')
+    page = models.CharField(max_length=32)
+    preferences = models.JSONField(default=dict)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=('user', 'page'), name='accounts_unique_workspace_layout')]

@@ -59,7 +59,18 @@ class AssessmentAdmin(AdministratorAdminMixin, admin.ModelAdmin):
     list_select_related = ('course', 'term__academic_year')
 
 
-class AuditedAdmin(AdministratorAdminMixin, admin.ModelAdmin):
+class ReadOnlyAcademicAdmin(AdministratorAdminMixin, admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class AuditedAdmin(ReadOnlyAcademicAdmin):
     readonly_fields = ('updated_by', 'created_at', 'updated_at')
 
     def get_form(self, request, obj=None, **kwargs):
@@ -86,7 +97,7 @@ class ScoreAdmin(AuditedAdmin):
 
 
 @admin.register(AttendanceSession)
-class AttendanceSessionAdmin(AdministratorAdminMixin, admin.ModelAdmin):
+class AttendanceSessionAdmin(ReadOnlyAcademicAdmin):
     list_display = ('course', 'term', 'date', 'teacher', 'lesson_label')
     list_filter = ('course', 'term', 'teacher')
     search_fields = ('course__code', 'lesson_label', 'teacher__employee_number')

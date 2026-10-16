@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Grading & resits · Student Record System{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>Grading &amp; resit rules</h1><p>Set a separate pass threshold and resit calculation for each course and term.</p></div></div>
+<section class="workspace"><h2>{% if editing %}Edit {{ editing }}{% else %}Add a course and term rule{% endif %}</h2>
+<p>Only assigned teachers enter grades. Original scores are retained. A resit below the pass threshold marks the student as failing and needing to repeat the course. No resit rule is assumed for courses without an enabled configuration.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="action-primary" type="submit">Save grading rule</button>{% if editing %} <a href="{% url 'academics:grading_policies' %}">Cancel edit</a>{% endif %}</form></section>
+<section class="workspace"><h2>Configured rules</h2><div class="table-scroll"><table><thead><tr><th>Course</th><th>Term</th><th>Pass threshold</th><th>Resit calculation</th><th>Cap</th><th>Status</th><th>Action</th></tr></thead><tbody>
+{% for policy in policies %}<tr><td>{{ policy.course }}</td><td>{{ policy.term }}</td><td>{{ policy.pass_percentage }}%</td><td>{{ policy.get_method_display }}{% if policy.method == 'weighted' %} · {{ policy.resit_weight }}% resit{% endif %}</td><td>{% if policy.cap_percentage != None %}{{ policy.cap_percentage }}%{% else %}None{% endif %}</td><td>{{ policy.enabled|yesno:'Enabled,Disabled' }}</td><td><a href="{% url 'academics:grading_policy_edit' policy.pk %}">Edit rule</a></td></tr>{% empty %}<tr><td colspan="7">No grading rules configured.</td></tr>{% endfor %}
+</tbody></table></div><p>Changing a rule affects future first resit entries. Recorded resits retain the rule and assessment maximum used when they were entered.</p></section>
+{% endblock %}

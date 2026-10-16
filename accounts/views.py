@@ -4,9 +4,13 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+import json
 
 from .forms import LoginForm
 from .models import User
+from .policies import roles_required
 
 
 ROLE_ROUTES = {
@@ -48,6 +52,40 @@ def home(request):
 
 @login_required
 def role_home(request, role):
-    if request.user.role != role:
+    if not request.user.is_active or request.user.role != role:
         raise PermissionDenied
-    return render(request, f'accounts/{role}_home.html')
+    from .dashboard import dashboard_context
+    return render(request, f'accounts/{role}_home.html', dashboard_context(request.user, request))
+
+
+@roles_required(User.Role.ADMINISTRATOR)
+def setup(request):
+    from .dashboard import dashboard_context
+    return render(request, 'accounts/setup.html', dashboard_context(request.user))
+
+
+@roles_required(*User.Role.values)
+@require_POST
+def save_layout(request):
+    from .layouts import allowed_widgets
+    from .models import WorkspaceLayout
+    if len(request.body) > 4096:
+        return JsonResponse({'error': 'Layout preferences are too large.'}, status=400)
+    try:
+        data = json.loads(request.body)
+        if not isinstance(data, dict) or set(data) != {'page', 'hidden', 'collapsed'}:
+            raise ValueError
+        if not isinstance(data['page'], str):
+            raise ValueError
+        allowed = allowed_widgets(request.user, data['page'])
+        if allowed is None:
+            raise PermissionDenied
+        for name in ('hidden', 'collapsed'):
+            values = data[name]
+            if not isinstance(values, list) or len(values) > len(allowed) or any(not isinstance(v, str) or v not in allowed for v in values):
+                raise ValueError
+        preferences = {name: sorted(set(data[name])) for name in ('hidden', 'collapsed')}
+    except (ValueError, TypeError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Choose valid layout sections.'}, status=400)
+    WorkspaceLayout.objects.update_or_create(user=request.user, page=data['page'], defaults={'preferences': preferences})
+    return JsonResponse({'saved': True})

@@ -1,0 +1,106 @@
+/* Reference HTML utilities are compiled locally; these rules join its shell to Django. */
+.stitch-shell .site-header { height:64px; min-height:64px; padding:0 40px; gap:16px; }
+.stitch-brand { text-decoration:none; flex-shrink:0; }
+.stitch-shell .header-search { margin:0 24px; padding:0; border:0; background:none; display:block; }
+.stitch-shell .header-search input { padding-left:36px; min-height:32px; font-size:13px; }
+.stitch-shell .logout-form { margin:0; }
+.stitch-shell .logout-form button { min-height:32px; }
+.stitch-shell .workspace-sidebar { top:64px; padding:16px; }
+.stitch-shell .workspace-sidebar nav a { font-size:13px; font-weight:500; min-height:40px; padding:10px 16px; }
+.stitch-shell .workspace-sidebar nav a[aria-current=page] { font-weight:600; }
+.stitch-shell .sidebar-footer { margin-top:24px; }
+.stitch-shell .content-page { padding:24px 40px 48px; }
+.stitch-dashboard { font-size:13px; line-height:18px; }
+.stitch-dashboard h1,.stitch-dashboard h2,.stitch-dashboard h3,.stitch-dashboard h4,.stitch-dashboard p { margin:0; }
+.stitch-dashboard a { text-decoration:none; }
+.stitch-dashboard a:hover { text-decoration:underline; }
+.stitch-dashboard h1 { font-size:24px; line-height:32px; }
+.stitch-dashboard h2 { font-size:16px; line-height:24px; }
+.stitch-dashboard h3,.stitch-dashboard h4 { font-size:13px; line-height:18px; }
+.stitch-dashboard p { line-height:1.5; }
+.stitch-dashboard button { min-height:0; border-radius:2px; }
+.stitch-dashboard form { margin:0; }
+.stitch-directory-filter { margin-top:16px!important; }
+.stitch-directory-filter input,.stitch-directory-filter select { min-height:36px; font-size:13px; }
+.stitch-directory-filter select { width:100%; padding:8px 12px; border:1px solid #c5c5d3; border-radius:2px; }
+.stitch-dashboard table { min-width:780px; font-size:13px; }
+.stitch-dashboard table th { background:#f2f4f6; font-size:11px; line-height:14px; }
+.stitch-dashboard table td { border-bottom:1px solid #e6e8ea; vertical-align:middle; }
+.stitch-dashboard tbody tr:nth-child(even) { background:white; }
+.stitch-dashboard tbody tr:hover { background:#f2f4f6; }
+.stitch-dashboard table .icon { width:18px; height:18px; }
+.stitch-pagination select { min-height:24px; padding:2px 24px 2px 8px; }
+.stitch-pagination label { font-weight:400; margin:0; }
+.stitch-dashboard [class*=overflow-x] { scrollbar-color:#94a3b8 #f2f4f6; }
+@media (min-width:768px) and (max-width:1199px) {
+ .stitch-shell .workspace-sidebar { width:72px; padding:16px 8px; }
+ .stitch-shell .workspace-sidebar>div>div:first-child { display:none; }
+ .stitch-shell .workspace-sidebar nav a { padding:10px; justify-content:center; }
+ .stitch-shell .workspace-sidebar .uppercase { display:none; }
+ .stitch-shell .content-page { margin-left:72px; padding:24px; }
+ .stitch-shell .site-header { padding:0 24px; }
+ .stitch-shell .site-header .hidden.lg\:flex { display:none; }
+ .stitch-shell .site-header .hidden.sm\:flex { display:none; }
+ .stitch-shell .header-search { margin:0; }
+}
+@media (max-width:767px) {
+ .stitch-shell .site-header { padding:0 12px; gap:8px; }
+ .stitch-brand .text-headline-sm { font-size:12px; line-height:16px; }
+ .stitch-brand .text-caption,.stitch-shell .site-header .hidden,.stitch-shell .header-search,.stitch-shell .site-header .h-6 { display:none; }
+ .stitch-shell .site-header .space-x-6 { margin:0; }
+ .stitch-shell .site-header>.flex:first-of-type { flex:1; }
+ .stitch-shell .site-header .space-x-4 { gap:0; }
+ .stitch-shell .site-header .space-x-4>* { margin:0; }
+ .stitch-shell .site-header .space-x-3 { gap:8px; }
+ .stitch-shell .site-header .space-x-3>* { margin:0; }
+ .stitch-shell .site-header .rounded-full { display:none; }
+ .stitch-shell .logout-form button { padding:6px 8px; font-size:11px; }
+ .stitch-shell .logout-form .icon { display:none; }
+ .stitch-shell .content-page { margin-left:0; padding:24px 16px 40px; }
+ .stitch-shell .workspace-sidebar { top:64px; width:256px; }
+ .stitch-shell .workspace-sidebar nav { grid-template-columns:1fr; }
+ .stitch-shell .drawer-overlay:not([hidden]) { top:64px; }
+ .stitch-dashboard>div:first-child>.flex { flex-wrap:wrap; gap:8px; }
+ .stitch-dashboard>div:first-child>.flex>* { margin:0; }
+}
+@media print {
+ .stitch-dashboard button,.stitch-directory-filter,.stitch-pagination form { display:none!important; }
+ .stitch-dashboard .lg\:col-span-4 { display:none; }
+ .stitch-dashboard table { min-width:0; font-size:9pt; }
+ .stitch-dashboard section>div { min-height:0; padding:12px; }
+ .stitch-dashboard section { grid-template-columns:repeat(4,1fr); }
+ .stitch-shell .content-page { margin:0; padding:0; }
+}
+/* Match the reference's 16px utility scale while preserving application body text. */
+:root { font-size:16px; }
+body { font-size:14px; }
+:where(.stitch-shell *,.stitch-shell ::before,.stitch-shell ::after) { border-width:0; border-style:solid; border-color:#e6e8ea; }
+.stitch-dashboard ul { list-style:none; padding:0; margin-bottom:0; }
+.stitch-dashboard table { min-width:880px; }
+.stitch-dashboard table th,.stitch-dashboard table td { overflow-wrap:normal; word-break:normal; }
+.stitch-dashboard table td:first-child,.stitch-dashboard table td:last-child { white-space:nowrap; }
+.stitch-dashboard table td:nth-child(2) { min-width:190px; }
+.stitch-dashboard table td:nth-child(3) { min-width:86px; }
+.stitch-dashboard table th:last-child { min-width:100px; }
+.stitch-dashboard table td:nth-child(2) .text-caption { overflow-wrap:anywhere; }
+.stitch-dashboard .lg\:col-span-8,.stitch-dashboard .lg\:col-span-4 { min-width:0; }
+@media print { .stitch-dashboard table { min-width:0; } }
+/* Quiet shared navigation: one brand, compact search and account actions. */
+.stitch-shell .compact-header { justify-content:flex-start; box-shadow:none; }
+.compact-brand { display:flex; align-items:center; gap:12px; font-size:16px; font-weight:650; color:#00236f; }
+.compact-brand-mark { display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:3px; background:#00236f; color:white; }
+.stitch-shell .compact-search { position:relative; flex:0 1 300px; margin-left:auto; margin-right:20px; }
+.compact-search>.icon { position:absolute; left:10px; top:8px; width:18px; height:18px; color:#545f73; }
+.stitch-shell .compact-search input { min-height:36px; padding:8px 12px 8px 36px; background:#f7f9fb; border-color:#e2e8f0; }
+.compact-account { display:flex; align-items:center; gap:20px; margin-left:auto; min-width:0; }
+.compact-account-name { font-size:13px; color:#475569; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.compact-account button { font-size:12px; }
+.compact-signin { margin-left:auto; }
+.stitch-shell .workspace-sidebar .sidebar-more { margin:16px 0 0; padding:8px 0 0; border:0; border-top:1px solid #e2e8f0; background:transparent; }
+.sidebar-more summary { display:flex; align-items:center; gap:12px; padding:8px 16px; color:#545f73; font-size:12px; font-weight:500; }
+.sidebar-more summary::after { content:'›'; margin-left:auto; }
+.sidebar-more[open] summary::after { content:'⌄'; }
+.compact-sidebar-footer { color:#64748b; font-size:11px; padding:12px 16px; }
+@media (min-width:768px) and (max-width:1199px) { .compact-account-name { display:none; } .sidebar-more summary { justify-content:center; padding:8px; } .sidebar-more summary span,.sidebar-more summary::after { display:none; } }
+@media (max-width:767px) { .compact-brand { font-size:12px; gap:8px; flex:1; } .compact-account-name { display:none; } .compact-account { margin:0; } .stitch-shell .compact-search { display:none; } .compact-account button { font-size:11px; } .compact-brand-mark { width:28px; height:28px; flex-shrink:0; } }
+@media print { .sidebar-more { display:none; } }

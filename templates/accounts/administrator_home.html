@@ -1,12 +1,120 @@
-{% extends "accounts/home.html" %}
+{% extends 'base.html' %}
+{% block title %}Administrator overview · Student Record System{% endblock %}
+{% block content %}
+<div class="stitch-dashboard">
+<!-- Content Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-surface-container-high">
+<div>
+<h1 class="text-headline-lg font-headline-lg font-bold text-on-surface tracking-tight">Administrator Overview</h1>
+<p class="text-body-sm font-body-sm text-secondary mt-0.5">
+            {% if directory_term %}{{ directory_term }}{% elif workspace_period %}{{ workspace_period }}{% else %}Academic records{% endif %} • Office of the Registrar
+          </p>
+</div>
+<div class="flex items-center space-x-3">
+<button class="px-4 py-2 bg-surface-container-lowest border border-outline-variant text-on-surface hover:bg-surface-container-low font-label-md text-label-md rounded flex items-center gap-2 shadow-sm transition-colors duration-150" type="button" data-print>
+{% include 'components/icon.html' with name='print' %}
+<span>Print overview</span>
+</button>
+{% for item in setup_actions %}{% if item.label == 'Accounts' and item.add_url %}<a class="px-4 py-2 bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md rounded flex items-center gap-2 shadow-sm" href="{{ item.add_url }}">{% include 'components/icon.html' with name='students' %}New registration</a>{% endif %}{% endfor %}
+</div>
+</div>
+{% if corrections_enabled %}<section class="workspace correction-inbox" data-layout-widget="corrections" data-layout-title="Teacher record changes"><div class="workspace-heading"><div><h2>Teacher record changes</h2><p>{{ correction_pending_count|default:0 }} awaiting review</p></div><a href="{% url 'academics:corrections' %}">Review changes</a></div>{% for correction in recent_corrections %}<article><h3><a href="{% url 'academics:correction_detail' correction.pk %}">{{ correction.teacher.get_full_name|default:correction.teacher.username }} · {{ correction.get_kind_display }}</a></h3><p>{{ correction.reason }}</p><p class="muted">{{ correction.created_at|date:'d M Y H:i' }}</p></article>{% empty %}<p class="muted">No teacher corrections awaiting review.</p>{% endfor %}</section>{% endif %}
+<section class="layout-metrics my-6" data-layout-metrics data-layout-group aria-label="School summaries">
+<details open class="layout-metric" data-layout-widget="enrolled" data-layout-title="Total enrolled students"><summary>Total enrolled students<span>{% include 'components/icon.html' with name='students' %}</span></summary><div class="layout-metric-body"><strong class="layout-metric-value">{{ dashboard_counts.0.1 }} Enrolled</strong><div class="layout-metric-footer"><span>Non-withdrawn enrolments</span><span class="status-badge">Across {{ enrolled_course_count }} courses</span></div></div></details>
+<details open class="layout-metric" data-layout-widget="faculty" data-layout-title="Assigned faculty"><summary>Assigned faculty<span>{% include 'components/icon.html' with name='students' %}</span></summary><div class="layout-metric-body"><strong class="layout-metric-value">{{ dashboard_counts.1.1 }} Teachers</strong><div class="layout-metric-footer"><span>{% for teacher in assigned_faculty %}{{ teacher.get_full_name|default:teacher.username }}{% if not forloop.last %}, {% endif %}{% empty %}No assigned faculty{% endfor %}</span><span class="status-badge status-active">{% if directory_term %}Selected term{% else %}All terms{% endif %}</span></div></div></details>
+<details open class="layout-metric" data-layout-widget="assessment-total" data-layout-title="Assessment records"><summary>Assessment records<span>{% include 'components/icon.html' with name='scores' %}</span></summary><div class="layout-metric-body"><strong class="layout-metric-value">{{ dashboard_counts.2.1 }} Scores</strong><div class="layout-metric-footer"><span>{{ assessment_count }} Assessments defined</span><span>Across {{ assessment_course_count }} courses</span></div></div></details>
+<details open class="layout-metric" data-layout-widget="attendance-total" data-layout-title="Attendance tracked"><summary>Attendance tracked<span>{% include 'components/icon.html' with name='attendance' %}</span></summary><div class="layout-metric-body"><strong class="layout-metric-value">{{ dashboard_counts.3.1 }} Records</strong><span class="layout-present-rate">{% if attendance_totals.rate != None %}{{ attendance_totals.rate|floatformat:1 }}% Present{% else %}No attendance{% endif %}</span><div class="layout-metric-footer"><span>P: {{ attendance_totals.present }}</span><span>L: {{ attendance_totals.late }}</span><span>A: {{ attendance_totals.absent }}</span><span>E: {{ attendance_totals.excused }}</span></div></div></details>
+</section>
+<!-- TWO-COLUMN WORKSPACE: LEFT (WIDE) + RIGHT (COMPACT) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-start pb-12" data-layout-columns>
+<!-- LEFT COLUMN (WIDE, 8/12): Quick Student Lookup & Directory -->
+<div class="lg:col-span-8 space-y-6" data-layout-column>
+<div class="bg-surface-container-lowest rounded border border-surface-container-high overflow-hidden shadow-sm" data-layout-widget="directory" data-layout-title="Quick Student Lookup &amp; Directory">
+<!-- Table Header & Filter Bar -->
+<div class="p-space-lg border-b border-surface-container-high bg-surface-container-lowest">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+<div>
+<h2 class="text-headline-sm font-headline-sm font-bold text-on-surface">Quick Student Lookup &amp; Directory</h2>
+<p class="text-caption font-caption text-secondary">Institutional directory with calculated age and attendance status.</p>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-caption font-caption text-secondary">Displaying {{ directory_page|length }} of {{ directory_page.paginator.count }} records</span>
+</div>
+</div>
+<form class="stitch-directory-filter flex flex-col sm:flex-row gap-3" method="get"><div class="relative flex-1"><label class="visually-hidden" for="id_q">Student name or number</label><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-outline">{% include 'components/icon.html' with name='search' %}</div><input id="id_q" name="q" type="search" maxlength="100" value="{{ directory_form.q.value|default:'' }}" class="block w-full pl-9 pr-3 py-2 border border-outline-variant rounded text-body-sm" placeholder="Search by student ID or first / last name"></div><div class="sm:w-56"><label class="visually-hidden" for="id_term">Term</label>{{ directory_form.term }}</div><input type="hidden" name="size" value="{{ directory_size }}"><button class="px-3 py-2 bg-surface-container-low border border-outline-variant text-secondary rounded text-label-md flex items-center justify-center gap-1" type="submit">{% include 'components/icon.html' with name='search' %}Filter</button>{{ directory_form.errors }}</form></div>
+<!-- Data Table: 5 Records -->
+<div class="overflow-x-auto">
+<table class="w-full border-collapse text-left text-body-sm font-body-sm">
+<thead>
+<tr class="bg-surface-container-low border-b-2 border-surface-container-high text-secondary text-caption font-caption uppercase tracking-wider">
+<th class="py-3 px-4 font-semibold" scope="col">Student ID</th>
+<th class="py-3 px-4 font-semibold" scope="col">Full Name</th>
+<th class="py-3 px-4 font-semibold" scope="col">Age / DOB</th>
+<th class="py-3 px-4 font-semibold" scope="col">Enrolled Courses</th>
+<th class="py-3 px-4 font-semibold text-right" scope="col">Attendance</th>
+<th class="py-3 px-4 font-semibold text-right" scope="col">Score Avg</th>
+<th class="py-3 px-4 font-semibold text-center" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">{% for student in directory_page %}<tr class="hover:bg-surface-container-low transition-colors duration-100">
+<td class="py-3 px-4 font-mono text-label-sm font-label-sm text-primary font-bold">{{ student.student_number }}</td>
+<td class="py-3 px-4">
+<div class="font-semibold text-on-surface">{{ student.user.get_full_name|default:student.user.username }}</div>
+<div class="text-caption font-caption text-secondary">{{ student.user.email }}</div>
+</td>
+<td class="py-3 px-4">
+<span class="text-on-surface font-medium">{{ student.age }} yrs</span>
+<span class="text-caption font-caption text-secondary block">{{ student.date_of_birth|date:'M d, Y' }}</span>
+</td>
+<td class="py-3 px-4">
+<div class="flex flex-wrap gap-1">{% for enrollment in student.directory_courses %}<span class="px-2 py-0.5 rounded bg-surface-container-low text-secondary border border-outline-variant text-[11px] font-medium" title="{{ enrollment.course }} · {{ enrollment.term }}">{{ enrollment.course.code }}</span>{% empty %}<span class="text-caption text-secondary">No enrolments</span>{% endfor %}</div>
+</td>
+<td class="py-3 px-4 text-right">
+<span class="inline-flex items-center px-2 py-0.5 rounded-full text-caption font-caption font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        {% if student.present_rate != None %}{{ student.present_rate|floatformat:0 }}% Present{% else %}—{% endif %}
+                      </span>
+</td>
+<td class="py-3 px-4 text-right font-semibold text-on-surface font-data-tabular">{% if student.score_mean != None %}{{ student.score_mean|floatformat:1 }}%{% else %}—{% endif %}</td>
+<td class="py-3 px-4 text-center">
+<div class="inline-flex items-center space-x-1">
+<a class="px-2 py-1 text-primary hover:bg-secondary-container rounded text-label-sm font-medium" href="{% url 'students:detail' student.pk %}">Profile</a>
+<a class="p-1 text-secondary hover:bg-surface-container rounded" aria-label="Print record for {{ student.user.get_full_name|default:student.user.username }}" href="{% url 'academics:record' student.pk %}?print=1">
+{% include 'components/icon.html' with name='print' %}
+</a>
+</div>
+</td>
+</tr>{% empty %}<tr><td colspan="7" class="p-6 text-secondary">No students match these filters.</td></tr>{% endfor %}</tbody>
+</table>
+</div>
+<div class="stitch-pagination px-space-lg py-3 border-t border-surface-container-high bg-surface flex flex-wrap gap-3 items-center justify-between text-caption text-secondary"><form method="get" class="flex items-center gap-2"><label for="directory-size">Rows per page:</label><input type="hidden" name="q" value="{{ directory_form.q.value|default:'' }}"><input type="hidden" name="term" value="{{ directory_form.term.value|default:'' }}"><select id="directory-size" name="size" data-page-size class="w-auto py-0.5 px-2 border border-outline-variant rounded text-caption">{% for size in page_sizes %}<option value="{{ size }}"{% if size == directory_size %} selected{% endif %}>{{ size }}</option>{% endfor %}</select><noscript><button type="submit">Apply</button></noscript></form><span>{% if directory_page.paginator.count %}Showing {{ directory_page.start_index }}–{{ directory_page.end_index }} of {{ directory_page.paginator.count }} students{% else %}0 students{% endif %}</span><nav aria-label="Student directory pages" class="flex items-center gap-3">{% if directory_page.has_previous %}<a href="?{{ directory_query }}&amp;page={{ directory_page.previous_page_number }}">Previous</a>{% endif %}<span>Page {{ directory_page.number }} of {{ directory_page.paginator.num_pages }}</span>{% if directory_page.has_next %}<a href="?{{ directory_query }}&amp;page={{ directory_page.next_page_number }}">Next</a>{% endif %}</nav></div><p class="px-space-lg py-3 text-caption text-secondary">Present: present records ÷ recorded attendance. Score mean: unweighted average of recorded score percentages. A dash means no records.</p></div></div>
+<!-- RIGHT COLUMN (COMPACT, 4/12): Admin Shortcuts & Assessments Status -->
+<div class="lg:col-span-4 space-y-6" data-layout-column>
+<!-- CARD 1: Django Admin Shortcuts & Permissions Check -->
+<div class="bg-surface-container-lowest rounded border border-surface-container-high p-space-lg shadow-sm" data-layout-widget="quick-setup" data-layout-title="Administrative Quick Setup">
+<div class="flex items-center justify-between pb-3 border-b border-surface-container-high">
+<div class="flex items-center space-x-2">
+{% include 'components/icon.html' with name='settings' %}
+<h3 class="text-label-md font-label-md font-bold text-on-surface">Administrative Quick Setup</h3>
+</div>
+<span class="text-caption font-caption text-secondary">Django Admin</span>
+</div>
+<ul class="divide-y divide-surface-container-high text-body-sm mt-1">{% for item in setup_actions %}{% if item.label == 'Accounts' or item.label == 'Academic years' or item.label == 'Courses' or item.label == 'Assessments' %}<li class="py-3 flex items-center justify-between gap-3"><div class="flex items-center gap-2"><span class="text-emerald-600">{% include 'components/icon.html' with name='attendance' %}</span>{% if item.list_url %}<a class="font-medium text-on-surface hover:text-primary" href="{{ item.list_url }}">{% else %}<span>{% endif %}{% if item.label == 'Accounts' %}User &amp; profile provisioning{% elif item.label == 'Academic years' %}Academic years &amp; terms{% elif item.label == 'Courses' %}Course catalog &amp; sections{% else %}Assessments &amp; weights{% endif %}{% if item.list_url %}</a>{% else %}</span>{% endif %}</div>{% if item.add_url %}<a class="text-caption text-secondary" href="{{ item.add_url }}">Add<span class="visually-hidden"> {{ item.label }}</span></a>{% endif %}</li>{% endif %}{% empty %}<li class="py-3 text-secondary">Setup requires staff access and model permissions.</li>{% endfor %}</ul>
+<div class="mt-4 pt-3 border-t border-surface-container-high">
+{% if request.user.is_staff %}<a class="w-full inline-flex items-center justify-center gap-1.5 py-1.5 px-3 bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant rounded font-label-md text-label-md transition-colors" href="{% url 'admin:index' %}">
+<span>Open Full Django Admin Console</span>
+{% include 'components/icon.html' with name='logout' %}
+</a>{% endif %}
+</div>
+</div>
+<!-- CARD 2: Recent Assessment Sessions & Status -->
+<div class="bg-surface-container-lowest rounded border border-surface-container-high p-space-lg shadow-sm" data-layout-widget="recent-assessments" data-layout-title="Recent Assessment Sessions">
+<div class="flex items-center justify-between pb-3 border-b border-surface-container-high">
+<div class="flex items-center space-x-2">
+{% include 'components/icon.html' with name='scores' %}
+<h3 class="text-label-md font-label-md font-bold text-on-surface">Recent Assessment Sessions</h3>
+</div>
 
-{% block dashboard_content %}
-
-<section class="dashboard-section"><h2>Users and profiles</h2><p>Manage accounts and role profiles through Administration when you have staff access.</p><p class="availability">Available in Administration with staff access</p></section>
-
-<section class="dashboard-section"><h2>Academic setup</h2><p>Manage academic years, terms, and courses through Administration. Manage enrolments, assessments, scores, and attendance there too.</p><p class="availability">Academic setup available with staff access</p></section>
-
-<section class="dashboard-section"><h2>Student records</h2><p><a href="{% url 'students:list' %}">Find student profiles</a>. Open a profile to view and print its consolidated record.</p></section>
-
+</div>
+<div class="mt-4 space-y-3">{% for assessment in assessments %}<div class="p-3 bg-surface rounded border border-surface-container-high"><div class="flex items-start justify-between gap-2"><div><h4 class="font-semibold text-on-surface text-label-md">{{ assessment.title }}</h4><p class="text-caption text-secondary mt-0.5">Max score: {{ assessment.maximum_score|floatformat:'-2' }} • Weight: {{ assessment.weight|floatformat:'-2' }}%</p></div><span class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-800 text-[11px] border border-emerald-200">{{ assessment.recorded_count }} entered</span></div><div class="mt-2 text-caption text-secondary">{{ assessment.course.code }} · {{ assessment.term }}</div><a class="block mt-3 text-primary text-label-sm font-semibold" href="{% url 'academics:scores' %}">View recorded scores →</a></div>{% empty %}<p class="text-secondary">No assessments available.</p>{% endfor %}</div><div class="mt-4"><a class="w-full py-2 border border-primary text-primary hover:bg-secondary-container text-label-md rounded flex items-center justify-center gap-1.5" href="{% url 'academics:scores' %}">{% include 'components/icon.html' with name='scores' %}All assessment records</a></div></div>
+</div></div></div>
 {% endblock %}
-

@@ -1,15 +1,11 @@
-{% extends "base.html" %}
-{% block title %}Student profile · Student Record System{% endblock %}
-{% block content %}
-<h1>Student profile</h1>
-<p><a href="{% url 'academics:record' profile.pk %}">View printable record</a></p>
-<dl class="profile-details">
-  <dt>Student number</dt><dd>{{ profile.student_number }}</dd>
-  <dt>Name</dt><dd>{{ profile.user.get_full_name|default:profile.user.username }}</dd>
-  <dt>Date of birth</dt><dd>{{ profile.date_of_birth|date:"Y-m-d" }}</dd>
-  <dt>Age</dt><dd>{{ profile.age }}</dd>
-  <dt>Nationality</dt><dd>{{ profile.nationality|default:"Not recorded" }}</dd>
-  <dt>Gender</dt><dd>{{ profile.gender|default:"Not recorded" }}</dd>
-</dl>
-{% if request.user.role != 'student' %}<a href="{% url 'students:list' %}">Back to students</a>{% endif %}
-{% endblock %}
+{% extends 'base.html' %}{% block title %}{{ profile.user.get_full_name|default:profile.user.username }} · Student profile{% endblock %}
+{% load static assets %}{% block extra_styles %}<link rel="stylesheet" href="{% versioned_static 'css/dashboard.css' %}">{% endblock %}
+{% block content %}<p class="breadcrumb">{% if request.user.role != 'student' %}<a href="{% url 'students:list' %}">Students directory</a> / {% endif %}Student profile</p>
+<div class="page-heading"><div><h1>Student profile</h1><p>Personal information and access to the academic record.</p></div><div class="page-actions"><a class="action-primary" href="{% url 'academics:record' profile.pk %}">View printable record</a>{% if request.user.role == 'administrator' and request.user.is_staff and perms.accounts.change_studentprofile %}<a class="action-secondary" href="{% url 'admin:accounts_studentprofile_change' profile.pk %}">Edit student profile</a>{% endif %}</div></div>
+<section class="panel"><div class="profile-header"><span class="avatar avatar-large" aria-hidden="true">{{ profile.user.first_name|first|upper }}{{ profile.user.last_name|first|upper }}</span><div><h2>{{ profile.user.get_full_name|default:profile.user.username }}</h2><span class="status-badge">{{ profile.student_number }}</span><p>Student Record System · Personal profile</p></div></div>
+<dl class="profile-details"><dt>Student number</dt><dd>{{ profile.student_number }}</dd><dt>Name</dt><dd>{{ profile.user.get_full_name|default:profile.user.username }}</dd><dt>Date of birth</dt><dd>{{ profile.date_of_birth|date:'Y-m-d' }}</dd><dt>Age</dt><dd>{{ profile.age }}</dd><dt>Nationality</dt><dd>{{ profile.nationality|default:'Not recorded' }}</dd><dt>Gender</dt><dd>{{ profile.gender|default:'Not recorded' }}</dd></dl>
+<section class="profile-academic-summary" data-layout-group aria-labelledby="profile-summary-heading"><h3 id="profile-summary-heading">Academic overview</h3>
+<div class="layout-metrics profile-counts" data-layout-metrics data-layout-group aria-label="Academic summaries">{% for label, value in profile_counts %}<details open class="layout-metric layout-metric-compact" data-layout-widget="metric-{{ forloop.counter }}" data-layout-title="{{ label }}"><summary>{{ label }}</summary><div class="layout-metric-body"><strong class="layout-metric-value">{{ value }}</strong></div></details>{% endfor %}</div></section></section>
+<section class="record-section" data-layout-widget="enrolments" data-layout-title="Enrolled courses"><div class="workspace-heading"><h2>Enrolled courses</h2><a href="{% url 'academics:record' profile.pk %}">Complete academic record</a></div><div class="table-scroll" role="region" aria-label="Student enrolments" tabindex="0"><table><thead><tr><th>Course</th><th>Academic period</th><th>Enrolment status</th><th>Academic outcome</th></tr></thead><tbody>{% for enrollment in enrollments %}<tr><td><strong>{{ enrollment.course.code }}</strong><div class="table-detail">{{ enrollment.course.title }}</div></td><td>{{ enrollment.term }}</td><td><span class="status-badge status-{{ enrollment.status }}">{{ enrollment.get_status_display }}</span></td><td>{% if enrollment.course_resit_required %}<strong class="status-badge status-absent">Fail — course resit required</strong>{% else %}—{% endif %}</td></tr>{% empty %}<tr><td colspan="4">No enrolments available in your permitted courses.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="record-section" data-layout-widget="profile-scores" data-layout-title="Assessment scores"><h2>Assessment scores</h2>{% include 'academics/score_table.html' with nested=True %}<p class="muted">Showing up to 12 scores and 8 enrolments. Open the complete academic record for all permitted history.</p></section>
+{% if request.user.role != 'student' %}<p><a href="{% url 'students:list' %}">Back to students</a></p>{% endif %}{% endblock %}

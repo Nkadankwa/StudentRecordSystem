@@ -1,15 +1,23 @@
-@page { size: A4; margin: 16mm; }
-.site-header, .skip-link, .print-controls, .messages { display: none !important; }
-:root, body { color: #000; background: #fff; font-family: sans-serif; font-size: 10pt; }
-.content-page { width: 100%; margin: 0; }
-h1 { font-size: 20pt; } h2 { font-size: 14pt; break-after: avoid; } h3 { font-size: 11pt; break-after: avoid; }
-h4 { font-size: 10pt; break-after: avoid; }
-.record-section { margin: 1.5rem 0; }
-.record-section > h2 { border-bottom: 1px solid #777; padding-bottom: .3rem; }
-.profile-details { break-inside: avoid; }
-.table-scroll { overflow: visible; border: 0; }
-table { width: 100%; min-width: 0 !important; font-size: 9pt; }
-thead, tbody tr:hover { background: #fff; }
-thead { display: table-header-group; } tr { break-inside: avoid; }
-th, td { padding: .35rem; border-bottom: 1px solid #aaa; }
-a { color: #000; text-decoration: none; }
+@page { size:A4; margin:16mm; }
+.site-header,.workspace-sidebar,.drawer-overlay,.skip-link,.print-controls,.messages,.menu-toggle { display:none!important; }
+:root,body { color:#000; background:#fff; font-family:Inter,sans-serif; font-size:10pt; }
+.content-page,.workspace-shell .content-page { width:100%; max-width:none; margin:0; padding:0; }
+.record-sheet { border:0; padding:0; border-radius:0; }
+.record-heading { border-bottom:2px solid #222; }
+.record-heading h2 { color:#000; }
+h1 { font-size:20pt; } h2 { font-size:14pt; } h3 { font-size:11pt; } h4 { font-size:10pt; }
+h1,h2,h3,h4 { break-after:avoid; }
+.record-section { margin:20px 0; }
+.profile-details { break-inside:avoid; grid-template-columns:130px 1fr; }
+.profile-details dd { margin:0; }
+.profile-header .avatar { display:none; }
+.table-scroll { overflow:visible; border:0; }
+table { width:100%; min-width:0!important; font-size:9pt; }
+thead { display:table-header-group; }
+tr { break-inside:avoid; }
+th,td { padding:6px; border-bottom:1px solid #aaa; }
+thead,th,tbody tr:nth-child(even),tbody tr:hover { background:#fff; color:#000; }
+th { font-size:8pt; }
+.status-badge { background:#fff!important; color:#000!important; border-color:#777!important; }
+a { color:#000; text-decoration:none; }
+footer { margin-top:20px; font-size:8pt; }

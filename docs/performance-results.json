@@ -15,16 +15,16 @@
   },
   "requests": {
     "student_lookup": {
-      "median_seconds": 0.0121,
-      "queries": 4
+      "median_seconds": 0.0148,
+      "queries": 6
     },
     "scores": {
-      "median_seconds": 0.0281,
-      "queries": 8
+      "median_seconds": 0.0388,
+      "queries": 10
     },
     "attendance": {
-      "median_seconds": 0.0396,
-      "queries": 9
+      "median_seconds": 0.0426,
+      "queries": 11
     }
   },
   "backup_restore": "Passed: integrity, counts and restored Django request"

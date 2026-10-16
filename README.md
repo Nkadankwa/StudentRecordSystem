@@ -70,6 +70,12 @@ for atomic account/profile creation in code. Resolve conflicting profiles before
 
 ## Workflows and sample data
 
+For a populated dashboard, import the [fictional SQL dataset](data/README.md) with
+`python manage.py load_sample_sql` after migrations. It adds 24 students, three
+courses and linked scores/attendance, without preset passwords or changing existing records.
+Administrator dashboards have direct setup links; teacher dashboards show assigned
+rosters and entry actions; student dashboards show their own recent results and courses.
+
 - Students open **My profile**, **Scores**, **Attendance** and their printable record.
 - Teachers and administrators search students by number/name prefix and filter records
   by course and term. **Enter or update scores** loads the assessment roster.
@@ -92,6 +98,15 @@ Repeat runs preserve data/passwords; conflicts are rejected. The command refuses
 to run with debug off. Use a disposable development database, never production.
 
 ## Tests and project structure
+
+The frontend follows the supplied Stitch Academic Record Workspace design. See
+[the design integration](DESIGN.md) for the shared shell, local assets, responsive
+navigation and the boundary between working features and mockup-only content.
+Teaching assignments and scoped rosters are at `/academics/assignments/`; the
+administrator course catalog is at `/academics/catalog/`, and permission-aware
+setup links are at `/accounts/setup/`.
+Migration `academics.0003` normalizes legacy imported SQLite timestamps without
+changing their instants, allowing imported scores and attendance to pass concurrent-edit checks.
 
 ```powershell
 .\.venv\Scripts\python.exe manage.py test --noinput
@@ -124,9 +139,62 @@ attribution is not a complete revision history.
 
 Follow [deployment notes](docs/deployment.md) and [backup/restore steps](docs/operations.md).
 Production settings have been checked locally; no live server has been deployed.
+See [the handover](docs/handover.md) and [release verification](docs/release-verification.md)
+for acceptance evidence, the role demonstration and the historical credential finding.
+
+To create a portable source archive without secrets or installed environments:
+
+```powershell
+python tools/package_release.py dist/StudentRecordSystem-release.zip
+```
+
+Extract the archive outside the old virtual-environment directory and follow the
+local setup steps. The packaging command requires a new archive filename.
 
 Use focused branches and commits describing the problem and resulting behavior.
 Run relevant tests, system and migration checks before review. Include reviewed
 migrations when models change. Review `git diff` and `git diff --cached` before
 committing; exclude secrets, personal data, generated files and environments.
 Git initialization is intentionally omitted.
+
+### Updating the reference styles
+
+The supplied HTML design uses precompiled local CSS. Normal Django startup
+does not need Node.js. After changing its utility classes, rebuild with:
+
+```powershell
+cd tools/frontend
+npm install
+npm run build
+cd ../..
+```
+
+All styles are in `static/css/`. The header, sidebar and administrator overview
+are adapted directly from the supplied Stitch HTML, using database records.
+
+### Personalize page layouts
+
+Use **Edit layout** on the administrator, teacher and student dashboards, student
+profiles, course catalog or setup page. Hide sections with their **Hide** button
+or the visibility checkboxes. Remaining sections fill the available columns.
+Click a summary card's heading to collapse it, or collapse/expand all summaries
+from the layout controls. Hidden sections can be restored there at any time.
+**Restore default layout** shows all sections and opens the summaries.
+
+Choices save automatically to your account, separately for each page type,
+and remain available after reloading or signing in on another device. They change
+presentation only; existing record permissions and edit workflows still apply.
+If saving fails, a visible message and **Retry saving** button appear.
+Apply the `accounts.0003_workspace_layout` migration when updating another copy.
+### Grading and resits
+
+An administrator configures a separate rule for each course and academic term in **Grading & resits** (`/academics/grading/`). Choose the pass percentage, replacement / higher-score / weighted calculation, optional cap, and whether the rule is enabled. No pass threshold is assumed when a rule has not been configured.
+
+Assigned teachers enter original scores and, for scores below that rule's threshold, a resit score. Original scores remain visible and calculated results carry a resit identifier. Saved resits retain their calculation rule and assessment maximum when a policy is changed later. An unsuccessful resit displays **Fail — course resit required** in the student's course overview and printable record; this academic warning does not change the enrolment lifecycle status.
+
+### Submitted record corrections
+
+Only assigned teachers can enter scores and attendance. Changing submitted records requires a reason. Changes apply immediately and appear in the administrator's **Record changes** inbox with the teacher, reason, and before/after values. Administrators can accept changes or revoke them with a review reason. Revocation restores the previous values only when no later edit conflicts; conflicting records remain untouched.
+
+Administrators manage teaching assignments and grading rules and can read academic records, but cannot directly enter scores or attendance, including through Django admin. Apply migrations with `python manage.py migrate` when updating another installation.
+

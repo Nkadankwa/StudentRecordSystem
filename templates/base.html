@@ -1,47 +1,24 @@
-{% load static %}
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Student Record System{% endblock %}</title>
-  <link rel="stylesheet" href="{% static 'css/app.css' %}">
-  <link rel="stylesheet" href="{% static 'css/print.css' %}" media="print">
-</head>
-<body>
-  <a class="skip-link" href="#main-content">Skip to content</a>
-  <header class="site-header">
-    <a class="brand" href="{% url 'home' %}">Student Record System</a>
-    <nav aria-label="Main navigation">
-      {% if request.user.is_authenticated %}
-        {% if request.user.role == 'student' %}
-          <a href="{% url 'accounts:student_home' %}">Student dashboard</a>
-          <a href="{% url 'students:me' %}">My profile</a>
-        {% elif request.user.role == 'teacher' %}
-          <a href="{% url 'accounts:teacher_home' %}">Teacher dashboard</a>
-          <a href="{% url 'students:list' %}">Assigned students</a>
-        {% elif request.user.role == 'administrator' %}
-          <a href="{% url 'accounts:administrator_home' %}">Administrator dashboard</a>
-          <a href="{% url 'students:list' %}">Students</a>
-          {% if request.user.is_staff %}<a href="{% url 'admin:index' %}">Administration</a>{% endif %}
-        {% endif %}
-        <a href="{% url 'academics:scores' %}"{% if request.resolver_match.namespace == 'academics' and request.resolver_match.url_name == 'scores' or request.resolver_match.url_name == 'score_entry' %} aria-current="page"{% endif %}>Scores</a>
-        <a href="{% url 'academics:attendance' %}"{% if request.resolver_match.namespace == 'academics' and request.resolver_match.url_name == 'attendance' or request.resolver_match.url_name == 'attendance_entry' or request.resolver_match.url_name == 'attendance_new' %} aria-current="page"{% endif %}>Attendance</a>
-        <form method="post" action="{% url 'accounts:logout' %}">
-          {% csrf_token %}<button class="secondary" type="submit">Sign out</button>
-        </form>
-      {% else %}
-        <a href="{% url 'accounts:login' %}">Sign in</a>
-      {% endif %}
-    </nav>
-  </header>
-  <main id="main-content" tabindex="-1" class="{% block page_class %}content-page{% endblock %}">
-    {% if messages %}
-      <ul class="messages" aria-live="polite" aria-label="Notifications">
-        {% for message in messages %}<li>{{ message }}</li>{% endfor %}
-      </ul>
-    {% endif %}
-    {% block content %}{% endblock %}
-  </main>
-</body>
-</html>
+{% load static assets %}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block title %}Student Record System{% endblock %}</title>
+<link rel="stylesheet" href="{% versioned_static 'css/app.css' %}">
+<link rel="stylesheet" href="{% versioned_static 'css/stitch.css' %}">
+<link rel="stylesheet" href="{% versioned_static 'css/stitch-shell.css' %}">
+<link rel="stylesheet" href="{% versioned_static 'css/layout.css' %}">
+{% if workspace_layout %}<script defer src="{% versioned_static 'js/layout.js' %}"></script>{% endif %}
+{% block extra_styles %}{% endblock %}<link rel="stylesheet" href="{% versioned_static 'css/green-workspace.css' %}"><link rel="stylesheet" href="{% versioned_static 'css/print.css' %}" media="print"><script defer src="{% versioned_static 'js/workspace.js' %}"></script>
+</head><body class="stitch-shell {% if request.user.is_authenticated %}workspace-shell{% else %}public-shell{% endif %}"><a class="skip-link" href="#main-content">Skip to content</a>
+{% if request.user.is_authenticated %}
+<div class="mobile-navigation"><button class="menu-toggle icon-button" type="button" aria-label="Open navigation" aria-controls="workspace-sidebar" aria-expanded="false" data-menu-toggle>{% include 'components/icon.html' with name='menu' %}</button><span>Student Record System</span></div>
+<button class="drawer-overlay" type="button" aria-label="Close navigation" data-menu-close hidden></button>
+<aside id="workspace-sidebar" class="workspace-sidebar">
+<div class="sidebar-content">
+<a class="sidebar-brand" href="{% url 'home' %}"><span class="sidebar-brand-mark">{% include 'components/icon.html' with name='institution' %}</span><span>Student Record<br>System</span></a>
+<p class="sidebar-role">{% if request.user.role == 'administrator' %}Administration{% elif request.user.role == 'teacher' %}Faculty workspace{% else %}Student workspace{% endif %}</p>
+{% if request.user.role != 'student' %}<form class="sidebar-search" method="get" action="{% url 'students:list' %}"><label class="visually-hidden" for="global-search">Search student number or name</label>{% include 'components/icon.html' with name='search' %}<input id="global-search" name="q" maxlength="100" placeholder="Find a student…" type="search"></form>{% endif %}
+<nav aria-label="Main navigation">{% for item in workspace_nav %}<a href="{{ item.url }}" aria-label="{{ item.label }}" title="{{ item.label }}"{% if item.active %} aria-current="page"{% endif %}>{% include 'components/icon.html' with name=item.icon %}<span>{{ item.label }}</span></a>{% endfor %}</nav>
+{% if request.user.role == 'administrator' and request.user.is_staff %}<details class="sidebar-more"><summary aria-label="Administration">{% include 'components/icon.html' with name='settings' %}<span>Administration</span></summary><nav aria-label="Administrative shortcuts">{% for item in workspace_admin_shortcuts %}<a href="{{ item.url }}" aria-label="{{ item.label }}" title="{{ item.label }}">{% include 'components/icon.html' with name=item.icon %}<span>{{ item.label }}</span></a>{% endfor %}<a href="{% url 'admin:index' %}" aria-label="Administration console">{% include 'components/icon.html' with name='settings' %}<span>Administration console</span></a></nav></details>{% endif %}
+</div>
+<div class="sidebar-account"><div class="sidebar-identity"><strong>{{ request.user.get_full_name|default:request.user.username }}</strong><span>{{ request.user.get_role_display }}</span></div><form action="{% url 'accounts:logout' %}" class="logout-form" method="post">{% csrf_token %}<button type="submit">{% include 'components/icon.html' with name='logout' %}<span>Sign out</span></button></form></div>
+</aside>
+{% else %}<header class="site-header public-header"><a class="sidebar-brand" href="{% url 'home' %}">{% include 'components/icon.html' with name='institution' %}<span>Student Record System</span></a><a href="{% url 'accounts:login' %}">Sign in</a></header>{% endif %}
+<main id="main-content" tabindex="-1" class="{% block page_class %}content-page{% endblock %}">{% if messages %}<ul class="messages" aria-live="polite" aria-label="Notifications">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>{% endif %}{% if workspace_layout %}{% include 'components/layout_controls.html' %}{{ workspace_layout|json_script:'workspace-layout-state' }}<div data-layout-save-url="{% url 'accounts:save_layout' %}" hidden></div>{% endif %}{% block content %}{% endblock %}</main></body></html>

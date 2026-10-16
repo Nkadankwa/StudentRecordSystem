@@ -1,11 +1,7 @@
-{% extends "accounts/home.html" %}
-
-{% block dashboard_content %}
-
-<section class="dashboard-section"><h2>My profile</h2><p><a href="{% url 'students:me' %}">View your student profile</a>.</p></section>
-
-<section class="dashboard-section"><h2>My attendance</h2><p><a href="{% url 'academics:attendance' %}">View your attendance</a>.</p></section>
-
-<section class="dashboard-section"><h2>My scores</h2><p><a href="{% url 'academics:scores' %}">View your scores</a>.</p></section>
-
-{% endblock %}
+{% extends 'accounts/home.html' %}
+{% block dashboard_subtitle %}{{ request.user.get_full_name|default:request.user.username }} · Your courses, results and attendance.{% endblock %}
+{% block dashboard_actions %}{% if student_profile %}<a class="action-primary" href="{% url 'academics:record' student_profile.pk %}">View / print my record</a><a class="action-secondary" href="{% url 'students:me' %}">My profile</a>{% endif %}{% endblock %}
+{% block dashboard_content %}<div class="dashboard-layout" data-layout-columns><div class="dashboard-main" data-layout-column>
+<section class="workspace" data-layout-widget="latest-scores" data-layout-title="Latest scores"><div class="workspace-heading"><h2>Latest scores</h2><a href="{% url 'academics:scores' %}">My score history</a></div><ul class="assessment-list">{% for score in recent_scores %}<li><div><strong>{{ score.assessment.title }}</strong><p>{{ score.assessment.course.code }} · {{ score.assessment.term }}</p></div><div class="score-value">{{ score.effective_value }} <span>/ {{ score.effective_maximum }}</span>{% if score.resit_value != None %}<span class="status-badge">Resit</span><span>{{ score.outcome }}</span>{% endif %}</div></li>{% empty %}<li class="dashboard-empty">No scores have been recorded for you yet.</li>{% endfor %}</ul></section>
+<section class="workspace" data-layout-widget="recent-attendance" data-layout-title="Recent attendance"><div class="workspace-heading"><h2>Recent attendance</h2><a href="{% url 'academics:attendance' %}">My attendance history</a></div><ul class="assessment-list">{% for record in recent_attendance %}<li><div><strong>{{ record.session.course.code }} · {{ record.session.course.title }}</strong><p>{{ record.session.date|date:'Y-m-d' }} · {{ record.session.lesson_label }}</p></div><span class="status-badge status-{{ record.status }}">{{ record.get_status_display }}</span></li>{% empty %}<li class="dashboard-empty">No attendance has been recorded for you yet.</li>{% endfor %}</ul></section></div>
+<aside class="workspace" data-layout-widget="my-courses" data-layout-title="My courses" data-layout-column><h2>My courses</h2><ul class="course-list">{% for enrollment in enrollments %}<li><strong>{{ enrollment.course.code }} · {{ enrollment.course.title }}</strong><p>{{ enrollment.term }}</p><span>Enrolment: {{ enrollment.get_status_display }}</span>{% if enrollment.course_resit_required %}<p><strong class="status-badge status-absent">Fail — course resit required</strong></p>{% endif %}</li>{% empty %}<li class="dashboard-empty">No current enrolments. Ask an administrator to check your profile and enrolments.</li>{% endfor %}</ul>{% if not student_profile %}<p class="dashboard-empty">Your account does not have a student profile yet. Ask an administrator to create it.</p>{% endif %}</aside></div>{% endblock %}

@@ -1,0 +1,11 @@
+@font-face { font-family:Inter; src:url('../fonts/inter-latin.woff2') format('woff2'); font-weight:100 900; font-display:swap; }
+:root,html[data-theme=light] { --primary:#176348; --secondary:#164c3b; --accent:#fff; --header-color:#fff; --header-branding-color:#fff; --header-bg:#164c3b; --link-fg:#176348; --link-selected-fg:#164c3b; --button-bg:#176348; --button-hover-bg:#164c3b; --default-button-bg:#164c3b; --body-bg:#e4eee5; --body-fg:#163d31; --darkened-bg:#e1eee0; --hairline-color:#c8dacb; --font-family-primary:Inter,system-ui,sans-serif; }
+body { font-family:Inter,system-ui,sans-serif; }
+#header { padding:20px 32px; }
+#site-name { font-size:20px; font-weight:650; }
+.workspace-return { display:inline-block; padding:8px 12px; border:1px solid #8fbb9d; border-radius:10px; font-size:12px; margin-left:20px; }
+.module { border-radius:10px; }
+.module h2,.module caption { font-weight:600; padding:12px; }
+#content { padding:28px 32px; }
+input,select,textarea { border-radius:10px; }
+@media(max-width:767px) { #header,#content { padding:16px; } .workspace-return { margin-left:0; margin-top:8px; } }

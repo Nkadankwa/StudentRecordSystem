@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "tailwindcss -c tailwind.config.cjs -i ../../static/css/stitch.input.css -o ../../static/css/stitch.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17",
+    "@tailwindcss/forms": "0.5.10"
+  }
+}
